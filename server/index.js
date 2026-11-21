@@ -7,6 +7,7 @@ const customerRoutes = require('./routes/customers');
 const invoiceRoutes = require('./routes/invoices');
 const expensesRoutes = require('./routes/expenses');
 const forecastRoutes = require('./routes/forecast');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 app.use(cors());
@@ -22,6 +23,16 @@ app.use('/api/customers', customerRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/expenses', expensesRoutes);
 app.use('/api/forecast', forecastRoutes);
+app.use('/api/analytics', analyticsRoutes);
+
+const path = require('path');
+const fs = require('fs');
+const distDir = path.join(__dirname, '..', 'client', 'dist');
+if (fs.existsSync(distDir)) {
+  app.use(express.static(distDir));
+  app.get(/^\/(?!api(\/|$)).*/, (req, res) => res.sendFile(path.join(distDir, 'index.html')));
+}
+
 
 app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND' }));
 

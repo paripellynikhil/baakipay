@@ -13,7 +13,8 @@ const CUSTOMER_SQL = `
   SELECT c.id, c.name, c.phone, c.upi_id, c.credit_limit,
     COALESCE(SUM(CASE WHEN i.status <> 'PAID' THEN i.total_amount - i.paid_amount END), 0) AS total_owed,
     COALESCE(MAX(CASE WHEN i.status <> 'PAID' THEN GREATEST(0, CURRENT_DATE - i.due_date) END), 0) AS max_days_overdue,
-    COALESCE(BOOL_OR(i.last_reminded_at IS NOT NULL AND i.last_reminded_at::date = CURRENT_DATE), false) AS reminded_today
+    COALESCE(BOOL_OR(i.last_reminded_at IS NOT NULL AND i.last_reminded_at::date = CURRENT_DATE), false) AS reminded_today,
+    COALESCE(ARRAY(SELECT i2.invoice_code FROM invoices i2 WHERE i2.customer_id = c.id AND i2.shop_id = c.shop_id AND i2.status <> 'PAID' ORDER BY i2.created_at), '{}') AS open_invoice_codes
   FROM customers c
   LEFT JOIN invoices i ON i.customer_id = c.id AND i.shop_id = c.shop_id
   WHERE c.shop_id = $1`;
@@ -31,6 +32,7 @@ function toCustomer(row) {
     maxDaysOverdue: Number(row.max_days_overdue),
     nearLimit: totalOwed >= NEAR_LIMIT_RATIO * creditLimit,
     remindedToday: row.reminded_today === true,
+    open_invoice_codes: Array.isArray(row.open_invoice_codes) ? row.open_invoice_codes : [],
   };
 }
 
