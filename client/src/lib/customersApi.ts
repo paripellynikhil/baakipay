@@ -10,6 +10,7 @@ export interface Customer {
   maxDaysOverdue: number;
   nearLimit: boolean;
   remindedToday: boolean;
+  open_invoice_codes?: string[];
 }
 
 export interface CustomerInput {

@@ -41,6 +41,10 @@ export interface RecurringBillInput {
 export interface ProfileUpdate {
   shop_name?: string;
   owner_name?: string;
+  bio?: string;
+  address?: string;
+  upi_id?: string;
+  language?: string;
   cash_in_hand?: number;
   default_credit_limit?: number;
   default_due_days?: number;

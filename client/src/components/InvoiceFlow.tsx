@@ -7,21 +7,11 @@ import HomePage from './HomePage';
 import ForecastPage from './ForecastPage';
 import CustomersPage from '../pages/CustomersPage';
 import ExpensesPage from '../pages/ExpensesPage';
-import PlaceholderPage from '../pages/PlaceholderPage';
+import SettingsPage from './SettingsPage';
 import { useI18n } from '../i18n/I18n';
 import { getCustomers, type Customer } from '../lib/customersApi';
 import { listInvoices, type Invoice } from '../lib/invoicesApi';
 import { getProfile, type Shop } from '../lib/shopApi';
-
-type TitleKey = Parameters<typeof PlaceholderPage>[0]['titleKey'];
-
-const TAB_TITLES: Record<TabId, TitleKey> = {
-  home: 'home_title',
-  customers: 'customers_title',
-  future: 'future_title',
-  bills: 'bills_title',
-  settings: 'settings_title',
-};
 
 const NO_UNPAID_MSG = 'No unpaid bill for this customer';
 
@@ -125,7 +115,7 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
         ) : activeTab === 'bills' ? (
           <ExpensesPage />
         ) : (
-          <PlaceholderPage titleKey={TAB_TITLES[activeTab]} />
+          <SettingsPage shop={shop} onLogout={onLogout} />
         )}
       </Layout>
 

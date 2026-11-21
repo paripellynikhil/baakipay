@@ -16,3 +16,5 @@ body {
 .tabular {
   font-variant-numeric: tabular-nums;
 }
+
+@media print { body * { visibility: hidden; } .health-pdf-card, .health-pdf-card * { visibility: visible; } .health-pdf-root { position: static; background: none; } .health-pdf-card { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; } }

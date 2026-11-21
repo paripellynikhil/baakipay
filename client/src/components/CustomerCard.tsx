@@ -47,6 +47,16 @@ export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp }: Cu
         </div>
       </div>
 
+      {(customer.open_invoice_codes ?? []).length > 0 && (
+        <div className="flex flex-wrap gap-1">
+          {(customer.open_invoice_codes ?? []).map((code) => (
+            <span key={code} className="text-xs rounded-full px-2 py-0.5 bg-slate-100">
+              {code}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div>
         <p className="text-xs text-slate-500">{t('customers.owed')}</p>
         <p className="text-lg font-bold text-[#0F172A]">₹{owed.toLocaleString('en-IN')}</p>

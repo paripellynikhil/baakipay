@@ -67,7 +67,7 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
       if (filter === 'late' && !(c.maxDaysOverdue > 0)) return false;
       if (filter === 'near' && !c.nearLimit) return false;
       if (!q) return true;
-      return c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q);
+      return c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q) || (c.open_invoice_codes ?? []).some((code) => code.toLowerCase().includes(q));
     });
   }, [customers, query, filter]);
 
