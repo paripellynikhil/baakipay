@@ -2,7 +2,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { useI18n } from '../i18n/I18n';
 import type { EffectivePlan, Shop } from '../lib/shopApi';
 import type { Invoice } from '../lib/invoicesApi';
-import { balanceDueOf, formatRupees, toNum } from '../lib/invoiceMath';
+import { balanceDueOf, formatRupees, lineAmount, toNum } from '../lib/invoiceMath';
 import { ProofItemsTable } from './ProofItemsTable';
 import { linkClass } from './FormControls';
 
@@ -32,11 +32,26 @@ export default function InvoiceProofModal({ invoice, shop, customerName, custome
   const dueDate = invoice.dueDate ? invoice.dueDate.slice(0, 10) : '—';
   const invoiceDate = new Date(invoice.createdAt).toLocaleDateString('en-IN');
   const phoneDigits = customerPhone.replace(/\D/g, '');
-  const summary = t('invoices.waSummary')
-    .replace('{code}', invoice.invoiceCode)
-    .replace('{shop}', shopName)
-    .replace('{amount}', formatRupees(balanceDue))
-    .replace('{due}', dueDate);
+  const waLines = [
+    shopName,
+    `${t('invoices.code')}: ${invoice.invoiceCode}`,
+    '',
+    ...invoice.items.map((item) => {
+      const qty = toNum(item.qty);
+      const amount = lineAmount({
+        name: item.name,
+        qty,
+        unitPrice: toNum(item.unitPrice),
+        discount: toNum(item.discount),
+      });
+      return `${item.name} × ${qty} = ${formatRupees(amount)}`;
+    }),
+    '',
+    `${t('invoices.balanceDue')}: ${formatRupees(balanceDue)}`,
+    `${t('invoices.dueDate')}: ${dueDate}`,
+  ];
+  if (upiId) waLines.push(`UPI ID: ${upiId}`);
+  const summary = waLines.join('\n');
   const waHref = `https://wa.me/91${phoneDigits}?text=${encodeURIComponent(summary)}`;
 
   return (
@@ -45,7 +60,7 @@ export default function InvoiceProofModal({ invoice, shop, customerName, custome
         role="dialog"
         aria-modal="true"
         aria-labelledby="invoice-proof-title"
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-5 sm:rounded-2xl print:max-h-none print:overflow-visible print:shadow-none"
+        className="print-only-card max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-2xl bg-white p-5 sm:rounded-2xl print:max-h-none print:overflow-visible print:shadow-none"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between print:hidden">

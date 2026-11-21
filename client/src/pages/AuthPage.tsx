@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react';
+import BaakiPayLogo from '../components/BaakiPayLogo';
 import { LangSwitcher, Field, linkClass, primaryClass } from '../components/FormControls';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
@@ -129,7 +130,9 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
         <LangSwitcher />
 
         <div className="text-center">
-          <h1 className="text-2xl font-extrabold text-[#1E1B4B]">{t('appName')}</h1>
+          <h1 className="flex justify-center text-2xl font-extrabold text-[#1E1B4B]">
+            <BaakiPayLogo variant="light" />
+          </h1>
           <p className="text-sm text-slate-600">{t('tagline')}</p>
         </div>
 

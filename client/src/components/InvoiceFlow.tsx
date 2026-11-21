@@ -107,7 +107,7 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
         onLogout={onLogout}
       >
         {activeTab === 'home' ? (
-          <HomePage shop={shop} onOpenForecast={() => onTabChange('future')} />
+          <HomePage shop={shop} onOpenForecast={() => onTabChange('future')} onOpenCustomers={() => onTabChange('customers')} />
         ) : activeTab === 'future' ? (
           <ForecastPage />
         ) : activeTab === 'customers' ? (

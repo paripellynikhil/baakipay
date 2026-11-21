@@ -22,7 +22,7 @@ export function HealthPdfModal({
       role="dialog"
       aria-modal="true"
     >
-      <div className="health-pdf-card w-full max-w-lg rounded-2xl bg-white text-[#1E1B4B] shadow-xl">
+      <div className="health-pdf-card print-only-card w-full max-w-lg rounded-2xl bg-white text-[#1E1B4B] shadow-xl">
         <header className="print:hidden flex items-center justify-between border-b border-slate-200 px-5 py-4">
           <h2 className="text-lg font-semibold">{t('analytics.pdf_title')}</h2>
           <div className="flex gap-2">

@@ -17,4 +17,12 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-@media print { body * { visibility: hidden; } .health-pdf-card, .health-pdf-card * { visibility: visible; } .health-pdf-root { position: static; background: none; } .health-pdf-card { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; } }
+@media print {
+  body * { visibility: hidden; }
+  .health-pdf-card, .health-pdf-card * { visibility: visible; }
+  .health-pdf-root { position: static; background: none; }
+  .health-pdf-card { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; }
+  .print-only-card, .print-only-card * { visibility: visible; }
+  .print-only-card { position: absolute; left: 0; top: 0; width: 100%; margin: 0; max-height: none; overflow: visible; box-shadow: none; }
+  html, body { height: auto; overflow: visible; background: #fff; }
+}

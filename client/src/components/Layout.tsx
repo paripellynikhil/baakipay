@@ -9,6 +9,8 @@ import {
   Plus,
   type LucideIcon,
 } from 'lucide-react';
+import BaakiPayLogo from './BaakiPayLogo';
+import Breadcrumbs from './Breadcrumbs';
 import { useI18n } from '../i18n/I18n';
 import type { Lang, TranslationKey } from '../i18n/translations';
 
@@ -81,7 +83,9 @@ export default function Layout({
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col gap-4 bg-[#1E1B4B] p-5 text-white">
         <div className="px-1 pt-2">
-          <p className="text-2xl font-bold">₹→ BaakiPay</p>
+          <button type="button" onClick={() => onTabChange('home')} className="cursor-pointer">
+            <BaakiPayLogo variant="dark" />
+          </button>
           <p className="mt-1 text-xs text-white/70">{t('tagline')}</p>
         </div>
         <button
@@ -116,6 +120,9 @@ export default function Layout({
 
       <div className="flex min-h-screen flex-col lg:ml-[240px]">
         <header className="sticky top-0 z-30 flex items-center justify-between gap-3 bg-[#1E1B4B] px-4 py-3 text-white lg:static lg:bg-white lg:px-8 lg:text-[#1E1B4B] lg:border-b lg:border-[#E2E8F0]">
+          <button type="button" onClick={() => onTabChange('home')} className="shrink-0 cursor-pointer lg:hidden">
+            <BaakiPayLogo variant="dark" showWordmark={false} />
+          </button>
           <p className="min-w-0 flex-1 truncate font-semibold">{shopName}</p>
           <div className="flex items-center gap-2">
             <LangSwitcher />
@@ -146,6 +153,13 @@ export default function Layout({
         )}
 
         <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 pb-24 lg:px-8 lg:pb-6">
+          {activeTab !== 'home' && (
+            <Breadcrumbs
+              homeLabel={t('nav_home')}
+              currentLabel={t(TABS.find((tab) => tab.id === activeTab)?.labelKey ?? 'nav_home')}
+              onHome={() => onTabChange('home')}
+            />
+          )}
           {children}
         </main>
       </div>

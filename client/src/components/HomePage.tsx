@@ -17,13 +17,14 @@ const QUEUE_SIZE = 3;
 interface HomePageProps {
   shop: Shop;
   onOpenForecast: () => void;
+  onOpenCustomers: () => void;
 }
 
 function isOpen(inv: Invoice): boolean {
   return inv.status === 'UNPAID' || inv.status === 'PARTIAL';
 }
 
-export default function HomePage({ shop, onOpenForecast }: HomePageProps) {
+export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: HomePageProps) {
   const { t } = useI18n();
   const shopName = shop.shop_name ?? t('appName');
   const [loading, setLoading] = useState(true);
@@ -112,7 +113,15 @@ export default function HomePage({ shop, onOpenForecast }: HomePageProps) {
     <div className="flex flex-col gap-4 p-4">
       <h1 className="text-xl font-bold text-[#1E1B4B]">{t('home.section_title')}</h1>
       {loadError && <p className="rounded-xl bg-[#FEE2E2] p-3 text-sm text-[#991B1B]">{t('networkError')}</p>}
-      {creditWarn && <p className="rounded-xl bg-[#FEF3C7] p-3 text-sm text-[#92400E]">{t('home.credit_warning')}</p>}
+      {creditWarn && (
+        <button
+          type="button"
+          onClick={onOpenCustomers}
+          className="cursor-pointer rounded-xl bg-[#FEF3C7] p-3 text-left text-sm text-[#92400E]"
+        >
+          {t('home.credit_warning')}
+        </button>
+      )}
 
       <HomeKpis cashInHand={toNum(shop.cash_in_hand)} toCollect={toCollect} upcomingBills={upcomingBills} />
 
