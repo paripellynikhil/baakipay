@@ -3,6 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const shopRoutes = require('./routes/shop');
+const customerRoutes = require('./routes/customers');
+const invoiceRoutes = require('./routes/invoices');
 
 const app = express();
 app.use(cors());
@@ -14,6 +16,8 @@ app.get('/api/health', (req, res) =>
 
 app.use('/api/auth', authRoutes);
 app.use('/api/shop', shopRoutes);
+app.use('/api/customers', customerRoutes);
+app.use('/api/invoices', invoiceRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND' }));
 

@@ -1,24 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import Layout, { type TabId } from './components/Layout';
+import { type TabId } from './components/Layout';
+import InvoiceFlow from './components/InvoiceFlow';
 import { SkeletonCard } from './components/Skeletons';
-import { Toast } from './components/Toast';
 import { I18nProvider, useI18n } from './i18n/I18n';
 import { ApiError, clearSession, getToken } from './lib/api';
 import { getProfile, type Shop } from './lib/shopApi';
 import AuthPage from './pages/AuthPage';
 import OnboardingPage from './pages/OnboardingPage';
-import PlaceholderPage from './pages/PlaceholderPage';
 
 type Phase = 'loading' | 'auth' | 'retry' | 'ready';
-type TitleKey = Parameters<typeof PlaceholderPage>[0]['titleKey'];
-
-const TAB_TITLES: Record<TabId, TitleKey> = {
-  home: 'home_title',
-  customers: 'customers_title',
-  future: 'future_title',
-  bills: 'bills_title',
-  settings: 'settings_title',
-};
 
 function AppInner() {
   const { t } = useI18n();
@@ -26,7 +16,6 @@ function AppInner() {
   const [offline, setOffline] = useState(false);
   const [phase, setPhase] = useState<Phase>(() => (getToken() ? 'loading' : 'auth'));
   const [activeTab, setActiveTab] = useState<TabId>('home');
-  const [toast, setToast] = useState<string | null>(null);
 
   const loadProfile = useCallback(async () => {
     setPhase('loading');
@@ -104,19 +93,13 @@ function AppInner() {
   }
 
   return (
-    <>
-      <Layout
-        shopName={shop.shop_name ?? t('appName')}
-        offline={offline}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onAddBill={() => setToast(t('comingSoon'))}
-        onLogout={handleLogout}
-      >
-        <PlaceholderPage titleKey={TAB_TITLES[activeTab]} />
-      </Layout>
-      <Toast message={toast} onDone={() => setToast(null)} />
-    </>
+    <InvoiceFlow
+      shop={shop}
+      offline={offline}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      onLogout={handleLogout}
+    />
   );
 }
 
