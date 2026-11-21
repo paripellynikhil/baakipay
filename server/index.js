@@ -6,6 +6,7 @@ const shopRoutes = require('./routes/shop');
 const customerRoutes = require('./routes/customers');
 const invoiceRoutes = require('./routes/invoices');
 const expensesRoutes = require('./routes/expenses');
+const forecastRoutes = require('./routes/forecast');
 
 const app = express();
 app.use(cors());
@@ -20,6 +21,7 @@ app.use('/api/shop', shopRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/invoices', invoiceRoutes);
 app.use('/api/expenses', expensesRoutes);
+app.use('/api/forecast', forecastRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'NOT_FOUND' }));
 

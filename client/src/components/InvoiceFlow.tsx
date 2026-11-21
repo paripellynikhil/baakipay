@@ -3,6 +3,8 @@ import Layout, { type TabId } from './Layout';
 import InvoiceDrawer from './InvoiceDrawer';
 import InvoiceProofModal, { type ProofShop } from './InvoiceProofModal';
 import WhatsAppModal from './WhatsAppModal';
+import HomePage from './HomePage';
+import ForecastPage from './ForecastPage';
 import CustomersPage from '../pages/CustomersPage';
 import ExpensesPage from '../pages/ExpensesPage';
 import PlaceholderPage from '../pages/PlaceholderPage';
@@ -114,7 +116,11 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
         onAddBill={() => openDrawer(null)}
         onLogout={onLogout}
       >
-        {activeTab === 'customers' ? (
+        {activeTab === 'home' ? (
+          <HomePage shop={shop} onOpenForecast={() => onTabChange('future')} />
+        ) : activeTab === 'future' ? (
+          <ForecastPage />
+        ) : activeTab === 'customers' ? (
           <CustomersPage onAddBill={(c) => openDrawer(c)} onWhatsApp={(c) => void handleWhatsApp(c)} />
         ) : activeTab === 'bills' ? (
           <ExpensesPage />
