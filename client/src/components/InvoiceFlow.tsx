@@ -4,6 +4,7 @@ import InvoiceDrawer from './InvoiceDrawer';
 import InvoiceProofModal, { type ProofShop } from './InvoiceProofModal';
 import WhatsAppModal from './WhatsAppModal';
 import CustomersPage from '../pages/CustomersPage';
+import ExpensesPage from '../pages/ExpensesPage';
 import PlaceholderPage from '../pages/PlaceholderPage';
 import { useI18n } from '../i18n/I18n';
 import { getCustomers, type Customer } from '../lib/customersApi';
@@ -115,6 +116,8 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
       >
         {activeTab === 'customers' ? (
           <CustomersPage onAddBill={(c) => openDrawer(c)} onWhatsApp={(c) => void handleWhatsApp(c)} />
+        ) : activeTab === 'bills' ? (
+          <ExpensesPage />
         ) : (
           <PlaceholderPage titleKey={TAB_TITLES[activeTab]} />
         )}

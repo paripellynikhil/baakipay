@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AddCustomerModal } from '../components/AddCustomerModal';
+import { GotMoneyModal } from '../components/GotMoneyModal';
+import { SmsMatchModal } from '../components/SmsMatchModal';
 import { CustomerCard } from '../components/CustomerCard';
 import { inputClass } from '../components/FormControls';
 import { SkeletonList } from '../components/Skeletons';
@@ -8,6 +10,7 @@ import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
 import { ApiError, readCache } from '../lib/api';
 import { getCustomers, type Customer } from '../lib/customersApi';
+import { listInvoices } from '../lib/invoicesApi';
 
 type Filter = 'all' | 'late' | 'near';
 
@@ -32,8 +35,13 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<Filter>('all');
   const [adding, setAdding] = useState(false);
+  const [smsOpen, setSmsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const clearToast = useCallback(() => setToast(null), []);
+  const [paying, setPaying] = useState<{
+    customer: Customer;
+    invoices: { id: string; invoice_code: string; total: number; paid_amount: number; status: string }[];
+  } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -63,6 +71,29 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
     });
   }, [customers, query, filter]);
 
+  async function openGotMoney(customer: Customer) {
+    try {
+      const all = await listInvoices();
+      const mine = all
+        .filter((inv) => String(inv.customerId) === String(customer.id))
+        .map((inv) => ({
+          id: inv.id,
+          invoice_code: inv.invoiceCode,
+          total: Number(inv.totalAmount),
+          paid_amount: Number(inv.paidAmount),
+          status: inv.status.toLowerCase(),
+        }));
+      setPaying({ customer, invoices: mine });
+    } catch {
+      setToast(t('gotMoney.error'));
+    }
+  }
+
+  function handlePaid(message: string) {
+    setToast(message);
+    void load();
+  }
+
   function handleSaved() {
     setAdding(false);
     setToast(t('saved'));
@@ -73,13 +104,22 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
     <section className="flex flex-col gap-4">
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-bold text-[#1E1B4B]">{t('customers_title')}</h1>
-        <button
-          type="button"
-          onClick={() => setAdding(true)}
-          className="min-h-[44px] rounded-xl bg-[#F59E0B] px-4 text-sm font-bold text-[#0F172A] shadow-sm"
-        >
-          {t('customers.add')}
-        </button>
+        <div className="flex gap-2">
+          <button
+            type="button"
+            onClick={() => setSmsOpen(true)}
+            className="min-h-[44px] rounded-xl border border-[#E2E8F0] bg-white px-4 text-sm font-bold text-[#1E1B4B] shadow-sm"
+          >
+            {t('sms.title')}
+          </button>
+          <button
+            type="button"
+            onClick={() => setAdding(true)}
+            className="min-h-[44px] rounded-xl bg-[#F59E0B] px-4 text-sm font-bold text-[#0F172A] shadow-sm"
+          >
+            {t('customers.add')}
+          </button>
+        </div>
       </header>
 
       <input
@@ -130,13 +170,29 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
             key={c.id}
             customer={c}
             onAddBill={onAddBill}
-            onGotMoney={() => setToast(t('customers.gotMoneySoon'))}
+            onGotMoney={() => void openGotMoney(c)}
             onWhatsApp={onWhatsApp}
           />
         ))}
       </div>
 
       {adding && <AddCustomerModal onClose={() => setAdding(false)} onSaved={handleSaved} />}
+      <SmsMatchModal
+        open={smsOpen}
+        onClose={() => setSmsOpen(false)}
+        onDone={(msg) => {
+          setToast(msg);
+          void load();
+        }}
+      />
+      {paying && (
+        <GotMoneyModal
+          customer={{ id: paying.customer.id, name: paying.customer.name }}
+          invoices={paying.invoices}
+          onClose={() => setPaying(null)}
+          onPaid={handlePaid}
+        />
+      )}
       <Toast message={toast} onDone={clearToast} />
     </section>
   );

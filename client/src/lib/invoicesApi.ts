@@ -48,3 +48,13 @@ export interface RemindResult {
 export function remindInvoice(id: string): Promise<RemindResult> {
   return apiFetch<RemindResult>(`/api/invoices/${encodeURIComponent(id)}/remind`, { method: 'POST' });
 }
+
+export interface PayInput {
+  amount: number;
+  mode: 'upi' | 'cash';
+}
+
+// The server caps the amount at the remaining balance.
+export function payInvoice(id: string | number, input: PayInput): Promise<unknown> {
+  return apiFetch<unknown>(`/api/invoices/${encodeURIComponent(String(id))}/pay`, { method: 'POST', body: input });
+}

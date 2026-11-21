@@ -58,3 +58,9 @@ CREATE TABLE IF NOT EXISTS expenses (
   is_paid BOOLEAN DEFAULT false,
   created_at TIMESTAMP DEFAULT NOW()
 );
+
+-- Milestone 4 additions (idempotent)
+ALTER TABLE invoices ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP NULL;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS paid_at TIMESTAMP NULL;
+ALTER TABLE expenses ADD COLUMN IF NOT EXISTS notes TEXT;
+
