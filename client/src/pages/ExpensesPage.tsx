@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react';
 import { Check, Plus, Trash2 } from 'lucide-react';
+import { ConfirmDeleteModal } from '../components/ConfirmDeleteModal';
 import { Field, linkClass, primaryClass } from '../components/FormControls';
 import { SkeletonList } from '../components/Skeletons';
 import { Toast } from '../components/Toast';
@@ -194,6 +195,7 @@ export default function ExpensesPage() {
   const [loadFailed, setLoadFailed] = useState(false);
   const [adding, setAdding] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<Expense | null>(null);
   const [toast, setToast] = useState<string | null>(null);
 
   const dismissToast = useCallback(() => setToast(null), []);
@@ -235,6 +237,7 @@ export default function ExpensesPage() {
   }
 
   async function handleDelete(expense: Expense) {
+    setPendingDelete(null);
     setBusyId(expense.id);
     try {
       await removeExpense(expense.id);
@@ -292,7 +295,7 @@ export default function ExpensesPage() {
                     expense={expense}
                     busy={busyId === expense.id}
                     onMarkPaid={(e) => void handleMarkPaid(e)}
-                    onDelete={(e) => void handleDelete(e)}
+                    onDelete={(e) => setPendingDelete(e)}
                   />
                 ))}
               </ul>
@@ -309,7 +312,7 @@ export default function ExpensesPage() {
                     expense={expense}
                     busy={busyId === expense.id}
                     onMarkPaid={(e) => void handleMarkPaid(e)}
-                    onDelete={(e) => void handleDelete(e)}
+                    onDelete={(e) => setPendingDelete(e)}
                   />
                 ))}
               </ul>
@@ -319,6 +322,13 @@ export default function ExpensesPage() {
       )}
 
       {adding && <AddExpenseModal onClose={() => setAdding(false)} onSaved={() => void handleSaved()} />}
+      {pendingDelete && (
+        <ConfirmDeleteModal
+          name={pendingDelete.name}
+          onCancel={() => setPendingDelete(null)}
+          onConfirm={() => void handleDelete(pendingDelete)}
+        />
+      )}
       <Toast message={toast} onDone={dismissToast} />
     </section>
   );

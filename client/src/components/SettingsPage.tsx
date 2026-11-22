@@ -2,8 +2,11 @@ import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
 import { updateProfile, type Shop } from '../lib/shopApi';
+import { downloadShopBackup } from '../lib/shopBackup';
 import { Field, inputClass, linkClass, primaryClass } from './FormControls';
+import PricingCompareModal from './PricingCompareModal';
 import SettingsHelpCard from './SettingsHelpCard';
+import ShopBusinessCard from './ShopBusinessCard';
 import { Toast } from './Toast';
 
 interface SettingsPageProps {
@@ -57,6 +60,7 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [toast, setToast] = useState<string | null>(null);
+  const [compareOpen, setCompareOpen] = useState(false);
   const clearToast = useCallback(() => setToast(null), []);
 
   function setField(key: keyof ProfileForm) {
@@ -99,11 +103,14 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
     <div className="flex flex-col gap-5">
       <div className="flex flex-col gap-2 rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
         <p className="text-sm font-semibold text-slate-500">{t('settings.plan_label')}</p>
-        <span className="w-fit rounded-full bg-[#1E1B4B] px-3 py-1 text-sm font-semibold text-white">
-          {t(planLabelKey(shop))}
-        </span>
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="w-fit rounded-full bg-[#1E1B4B] px-3 py-1 text-sm font-semibold text-white">{t(planLabelKey(shop))}</span>
+          <button type="button" onClick={() => setCompareOpen(true)} className={`${linkClass} w-fit`}>{t('pricing.compare')}</button>
+        </div>
         <p className="text-xs text-slate-500">{t('settings.plan_readonly')}</p>
       </div>
+
+      <ShopBusinessCard info={form} phone={shop.email_or_phone} />
 
       <form onSubmit={(e) => void handleSave(e)} className="flex flex-col gap-4 rounded-2xl border border-[#E2E8F0] bg-white p-4 shadow-sm">
         <Field id="settings-shop-name" label={t('settings.shop_name')} value={form.shop_name} onChange={setField('shop_name')} />
@@ -172,6 +179,8 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
 
       <SettingsHelpCard />
 
+      <button type="button" onClick={() => void downloadShopBackup().catch(() => setError(t('settings.backup_error')))} className="min-h-[44px] w-full rounded-xl border border-[#E2E8F0] bg-white px-4 font-bold text-[#1E1B4B] shadow-sm">{t('settings.backup_button')}</button>
+
       <button
         type="button"
         onClick={onLogout}
@@ -180,6 +189,7 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
         {t('settings_logout')}
       </button>
 
+      {compareOpen && <PricingCompareModal onClose={() => setCompareOpen(false)} />}
       <Toast message={toast} onDone={clearToast} />
     </div>
   );

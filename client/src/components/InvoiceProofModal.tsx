@@ -3,6 +3,7 @@ import { useI18n } from '../i18n/I18n';
 import type { EffectivePlan, Shop } from '../lib/shopApi';
 import type { Invoice } from '../lib/invoicesApi';
 import { balanceDueOf, formatRupees, lineAmount, toNum } from '../lib/invoiceMath';
+import { buildWhatsAppUrl } from '../lib/whatsappUrl';
 import { ProofItemsTable } from './ProofItemsTable';
 import { linkClass } from './FormControls';
 
@@ -51,8 +52,9 @@ export default function InvoiceProofModal({ invoice, shop, customerName, custome
     `${t('invoices.dueDate')}: ${dueDate}`,
   ];
   if (upiId) waLines.push(`UPI ID: ${upiId}`);
+  if (shop.plan !== 'pro') waLines.push(t('share.sentVia'));
   const summary = waLines.join('\n');
-  const waHref = `https://wa.me/91${phoneDigits}?text=${encodeURIComponent(summary)}`;
+  const waHref = buildWhatsAppUrl(customerPhone, summary);
 
   return (
     <div className="fixed inset-0 z-40 flex items-end justify-center bg-black/40 print:static print:block print:bg-white sm:items-center sm:p-4" onClick={onClose}>
@@ -133,7 +135,7 @@ export default function InvoiceProofModal({ invoice, shop, customerName, custome
           )}
         </div>
 
-        {shop.plan === 'free' && <p className="mt-4 text-center text-xs text-slate-500">{t('invoices.poweredBy')}</p>}
+        {shop.plan !== 'pro' && <p className="mt-4 text-center text-xs text-slate-500">{t('analytics.powered_by')}</p>}
 
         <div className="mt-5 flex flex-col gap-2 print:hidden">
           <button

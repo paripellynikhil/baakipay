@@ -18,9 +18,11 @@ interface CustomerCardProps {
   onAddBill: (customer: Customer) => void;
   onGotMoney: () => void;
   onWhatsApp: (customer: Customer) => void;
+  onOpenInvoice: (code: string) => void;
+  onStatement: () => void;
 }
 
-export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp }: CustomerCardProps) {
+export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp, onOpenInvoice, onStatement }: CustomerCardProps) {
   const { t } = useI18n();
   const owed = Number(customer.totalOwed);
   const limit = Number(customer.creditLimit);
@@ -50,9 +52,14 @@ export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp }: Cu
       {(customer.open_invoice_codes ?? []).length > 0 && (
         <div className="flex flex-wrap gap-1">
           {(customer.open_invoice_codes ?? []).map((code) => (
-            <span key={code} className="text-xs rounded-full px-2 py-0.5 bg-slate-100">
+            <button
+              key={code}
+              type="button"
+              onClick={() => onOpenInvoice(code)}
+              className="min-h-[28px] rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-[#1E1B4B] underline-offset-2 hover:underline"
+            >
               {code}
-            </span>
+            </button>
           ))}
         </div>
       )}
@@ -103,6 +110,14 @@ export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp }: Cu
           {t('customers.whatsapp')}
         </button>
       </div>
+
+      <button
+        type="button"
+        onClick={onStatement}
+        className="min-h-[44px] rounded-xl border border-[#E2E8F0] bg-white px-2 text-sm font-semibold text-[#1E1B4B]"
+      >
+        {t('statement.button')}
+      </button>
     </article>
   );
 }

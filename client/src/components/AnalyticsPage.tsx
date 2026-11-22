@@ -15,9 +15,13 @@ export function AnalyticsPage() {
   const [shopName, setShopName] = useState('');
   const [isFreePlan, setIsFreePlan] = useState(false);
   const [open, setOpen] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
+    setLoading(true);
+    setFailed(false);
     // Profile is optional for this screen: if it fails, the analytics still render.
     Promise.all([fetchAnalytics(), getProfile().catch(() => null)])
       .then(([res, profile]) => {
@@ -30,7 +34,8 @@ export function AnalyticsPage() {
         }
       })
       .catch(() => {
-        // Nothing cached and the request failed: the page stays empty.
+        // Nothing cached and the request failed: show a retry prompt.
+        if (!cancelled) setFailed(true);
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -38,9 +43,25 @@ export function AnalyticsPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [retryTick]);
 
   if (loading) return <SkeletonList rows={4} />;
+  if (!data && failed) {
+    return (
+      <section className="flex flex-col items-start gap-2">
+        <p role="alert" className="text-sm font-semibold text-[#DC2626]">
+          {t('analytics.error')}
+        </p>
+        <button
+          type="button"
+          onClick={() => setRetryTick((n) => n + 1)}
+          className="min-h-[44px] rounded-xl bg-[#1E1B4B] px-4 text-sm font-semibold text-white"
+        >
+          {t('analytics.retry')}
+        </button>
+      </section>
+    );
+  }
   if (!data) return null;
 
   const kpis = [

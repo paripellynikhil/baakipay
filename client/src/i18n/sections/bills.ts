@@ -19,6 +19,8 @@ export const bills = {
     'bills.paidOn': 'Paid on',
     'bills.error': 'Could not save bill',
     'bills.markedPaid': 'Marked as paid',
+    'bills.deleteConfirmTitle': 'Delete this bill?',
+    'bills.deleteConfirmBody': 'Delete {name}? This cannot be undone.',
   },
   te: {
     'bills.title': 'నా బిల్లులు',
@@ -39,6 +41,8 @@ export const bills = {
     'bills.paidOn': 'చెల్లించిన తేదీ',
     'bills.error': 'బిల్లును సేవ్ చేయలేకపోయాం',
     'bills.markedPaid': 'చెల్లించినట్లు గుర్తించబడింది',
+    'bills.deleteConfirmTitle': 'ఈ బిల్లును తొలగించాలా?',
+    'bills.deleteConfirmBody': '{name} ను తొలగించాలా? దీన్ని తిరిగి పొందలేరు.',
   },
   hi: {
     'bills.title': 'मेरे बिल',
@@ -59,5 +63,7 @@ export const bills = {
     'bills.paidOn': 'भुगतान की तारीख',
     'bills.error': 'बिल सेव नहीं हो सका',
     'bills.markedPaid': 'भुगतान दर्ज हो गया',
+    'bills.deleteConfirmTitle': 'क्या यह बिल हटाना है?',
+    'bills.deleteConfirmBody': '{name} हटाएं? इसे वापस नहीं लाया जा सकता।',
   },
 } as const;

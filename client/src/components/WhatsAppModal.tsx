@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Toast } from './Toast';
 import { useI18n } from '../i18n/I18n';
 import { remindInvoice, type Invoice } from '../lib/invoicesApi';
+import { buildWhatsAppUrl } from '../lib/whatsappUrl';
 import { buildReminder, formatRupees, type ReminderLang, type ReminderTone } from '../i18n/reminders';
 import type { TranslationKey } from '../i18n/translations';
 
@@ -111,7 +112,7 @@ export default function WhatsAppModal({ customer, invoice, shopName, onClose, on
       setToast({ kind: 'err', text: t('reminders.noPhone') });
       return;
     }
-    window.open(`https://wa.me/${number}?text=${encodeURIComponent(message)}`, '_blank', 'noopener');
+    window.open(buildWhatsAppUrl(customer.phone, message), '_blank', 'noopener');
     await recordReminder();
   };
 

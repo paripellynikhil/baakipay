@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AddCustomerModal } from '../components/AddCustomerModal';
-import { GotMoneyModal } from '../components/GotMoneyModal';
 import { SmsMatchModal } from '../components/SmsMatchModal';
 import { CustomerCard } from '../components/CustomerCard';
+import { CustomerDocModals } from '../components/CustomerDocModals';
 import { inputClass } from '../components/FormControls';
 import { SkeletonList } from '../components/Skeletons';
 import { Toast } from '../components/Toast';
@@ -10,7 +10,7 @@ import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
 import { ApiError, readCache } from '../lib/api';
 import { getCustomers, type Customer } from '../lib/customersApi';
-import { listInvoices } from '../lib/invoicesApi';
+import { useCustomerDocs } from '../lib/useCustomerDocs';
 
 type Filter = 'all' | 'late' | 'near';
 
@@ -38,10 +38,7 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
   const [smsOpen, setSmsOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const clearToast = useCallback(() => setToast(null), []);
-  const [paying, setPaying] = useState<{
-    customer: Customer;
-    invoices: { id: string; invoice_code: string; total: number; paid_amount: number; status: string }[];
-  } | null>(null);
+  const docs = useCustomerDocs(t, setToast);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,24 +67,6 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
       return c.name.toLowerCase().includes(q) || c.phone.toLowerCase().includes(q) || (c.open_invoice_codes ?? []).some((code) => code.toLowerCase().includes(q));
     });
   }, [customers, query, filter]);
-
-  async function openGotMoney(customer: Customer) {
-    try {
-      const all = await listInvoices();
-      const mine = all
-        .filter((inv) => String(inv.customerId) === String(customer.id))
-        .map((inv) => ({
-          id: inv.id,
-          invoice_code: inv.invoiceCode,
-          total: Number(inv.totalAmount),
-          paid_amount: Number(inv.paidAmount),
-          status: inv.status.toLowerCase(),
-        }));
-      setPaying({ customer, invoices: mine });
-    } catch {
-      setToast(t('gotMoney.error'));
-    }
-  }
 
   function handlePaid(message: string) {
     setToast(message);
@@ -170,8 +149,10 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
             key={c.id}
             customer={c}
             onAddBill={onAddBill}
-            onGotMoney={() => void openGotMoney(c)}
+            onGotMoney={() => void docs.openGotMoney(c)}
             onWhatsApp={onWhatsApp}
+            onOpenInvoice={(code) => void docs.openInvoice(c, code)}
+            onStatement={() => void docs.openStatement(c)}
           />
         ))}
       </div>
@@ -185,14 +166,7 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
           void load();
         }}
       />
-      {paying && (
-        <GotMoneyModal
-          customer={{ id: paying.customer.id, name: paying.customer.name }}
-          invoices={paying.invoices}
-          onClose={() => setPaying(null)}
-          onPaid={handlePaid}
-        />
-      )}
+      <CustomerDocModals docs={docs} onPaid={handlePaid} />
       <Toast message={toast} onDone={clearToast} />
     </section>
   );

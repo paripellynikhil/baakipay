@@ -39,6 +39,13 @@ export function listInvoices(): Promise<Invoice[]> {
   return apiFetch<Invoice[]>('/api/invoices');
 }
 
+// Looks an invoice up by its INV-XXX code within the shop's invoice list.
+export async function getInvoiceByCode(code: string): Promise<Invoice | undefined> {
+  const all = await listInvoices();
+  return all.find((inv) => inv.invoiceCode === code);
+}
+
+
 
 export interface RemindResult {
   id: string;

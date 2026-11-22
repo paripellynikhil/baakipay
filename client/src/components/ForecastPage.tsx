@@ -36,6 +36,7 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
+  const [retryTick, setRetryTick] = useState(0);
   const [buffer, setBuffer] = useState<number>(readSafeBuffer);
 
   const { delayTop, badDay5, extraCredit15k } = toggles;
@@ -64,7 +65,7 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
     return () => {
       cancelled = true;
     };
-  }, [days, delayTop, badDay5, extraCredit15k]);
+  }, [days, delayTop, badDay5, extraCredit15k, retryTick]);
 
   function selectDays(next: number) {
     if (isFree && PRO_DAYS.includes(next)) return;
@@ -138,9 +139,18 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
 
           {!data ? (
             failed ? (
-              <p role="alert" className="text-sm font-semibold text-[#DC2626]">
-                {t('forecast.error')}
-              </p>
+              <div className="flex flex-col items-start gap-2">
+                <p role="alert" className="text-sm font-semibold text-[#DC2626]">
+                  {t('forecast.error')}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setRetryTick((n) => n + 1)}
+                  className="min-h-[44px] rounded-xl bg-[#1E1B4B] px-4 text-sm font-semibold text-white"
+                >
+                  {t('forecast.retry')}
+                </button>
+              </div>
             ) : (
               <SkeletonList rows={4} />
             )

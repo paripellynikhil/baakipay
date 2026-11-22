@@ -24,6 +24,8 @@ export const analytics = {
     'analytics.pdf_disclaimer': 'Self-generated operational summary from BaakiPay records. Not a bank-audited or CA-certified financial statement.',
     'analytics.powered_by': 'Powered by BaakiPay',
     'analytics.offline': 'Showing saved data (offline)',
+    'analytics.error': 'Could not load business health. Check your connection and try again.',
+    'analytics.retry': 'Retry',
   },
   te: {
     'analytics.pill_forecast': 'నగదు అంచనా',
@@ -49,6 +51,8 @@ export const analytics = {
     'analytics.pdf_disclaimer': 'Self-generated operational summary from BaakiPay records. Not a bank-audited or CA-certified financial statement.',
     'analytics.powered_by': 'BaakiPay ద్వారా ఆధారితం',
     'analytics.offline': 'సేవ్ చేసిన డేటా చూపుతోంది (ఆఫ్‌లైన్)',
+    'analytics.error': 'వ్యాపార ఆరోగ్యాన్ని లోడ్ చేయలేకపోయాం. మీ కనెక్షన్ తనిఖీ చేసి మళ్లీ ప్రయత్నించండి.',
+    'analytics.retry': 'మళ్లీ ప్రయత్నించు',
   },
   hi: {
     'analytics.pill_forecast': 'कैश फ़ोरकास्ट',
@@ -74,5 +78,7 @@ export const analytics = {
     'analytics.pdf_disclaimer': 'Self-generated operational summary from BaakiPay records. Not a bank-audited or CA-certified financial statement.',
     'analytics.powered_by': 'BaakiPay द्वारा संचालित',
     'analytics.offline': 'सहेजा गया डेटा दिखाया जा रहा है (ऑफ़लाइन)',
+    'analytics.error': 'व्यापार स्वास्थ्य लोड नहीं हो सका। अपना कनेक्शन जांचें और फिर से कोशिश करें।',
+    'analytics.retry': 'फिर से कोशिश करें',
   },
 };
