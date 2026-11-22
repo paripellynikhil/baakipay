@@ -1,37 +1,22 @@
 import { useState, type FormEvent } from 'react';
 import BaakiPayLogo from '../components/BaakiPayLogo';
-import { LangSwitcher, Field, linkClass, primaryClass } from '../components/FormControls';
+import LanguageDropdown from '../components/LanguageDropdown';
+import DuplicateAccountAlert from '../components/auth/DuplicateAccountAlert';
+import { HEADINGS, LINKS, SUBMIT_LABELS, type Mode } from '../components/auth/authConfig';
+import { Field, linkClass, primaryClass } from '../components/FormControls';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
 import { ApiError } from '../lib/api';
 import { forgotPassword, login, register, resetPassword, type Shop } from '../lib/shopApi';
 
-type Mode = 'login' | 'signup' | 'forgot' | 'reset';
 type ErrorMap = Record<string, TranslationKey>;
 
 const MIN_PASSWORD = 8;
 const missing = (...values: string[]) => values.some((v) => v.trim() === '');
 
-const HEADINGS: Record<Mode, TranslationKey> = { login: 'auth_login', signup: 'auth_signup', forgot: 'auth_forgot', reset: 'auth_forgot' };
-const SUBMIT_LABELS: Record<Mode, TranslationKey> = {
-  login: 'auth_signIn',
-  signup: 'auth_createAccount',
-  forgot: 'auth_sendOtp',
-  reset: 'auth_resetPassword',
-};
-const LINKS: Record<Mode, { key: TranslationKey; to: Mode }[]> = {
-  login: [
-    { key: 'auth_toSignup', to: 'signup' },
-    { key: 'auth_forgotLink', to: 'forgot' },
-  ],
-  signup: [{ key: 'auth_toLogin', to: 'login' }],
-  forgot: [{ key: 'auth_backToLogin', to: 'login' }],
-  reset: [{ key: 'auth_backToLogin', to: 'login' }],
-};
-
-export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void }) {
+export default function AuthPage({ onAuthed, initialMode = 'login', onBack }: { onAuthed: (shop: Shop) => void; initialMode?: 'login' | 'register'; onBack?: () => void }) {
   const { t } = useI18n();
-  const [mode, setMode] = useState<Mode>('login');
+  const [mode, setMode] = useState<Mode>(initialMode === 'register' ? 'signup' : 'login');
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
   const [shopName, setShopName] = useState('');
@@ -42,22 +27,30 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
   const [busy, setBusy] = useState(false);
   const [info, setInfo] = useState<string | null>(null);
   const [sandboxHint, setSandboxHint] = useState<string | null>(null);
+  const [duplicate, setDuplicate] = useState(false);
 
   function switchMode(next: Mode) {
     setMode(next);
     setError(null);
     setInfo(null);
     setSandboxHint(null);
+    setDuplicate(false);
   }
 
   // Shared request wrapper: maps known ApiError codes; everything else is a network/generic error.
-  async function run(action: () => Promise<void>, codes: ErrorMap = {}) {
+  // For registration (isSignup), HTTP 409 or ACCOUNT_EXISTS means the account is a duplicate.
+  async function run(action: () => Promise<void>, codes: ErrorMap = {}, isSignup = false) {
     setError(null);
     setInfo(null);
+    setDuplicate(false);
     setBusy(true);
     try {
       await action();
     } catch (err) {
+      if (isSignup && err instanceof ApiError && (err.status === 409 || err.code === 'ACCOUNT_EXISTS')) {
+        setDuplicate(true);
+        return;
+      }
       const mapped = err instanceof ApiError ? codes[err.code] : undefined;
       setError(t(mapped ?? 'networkError'));
     } finally {
@@ -84,7 +77,8 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
         const res = await register(emailOrPhone.trim(), password, shopName.trim(), ownerName.trim());
         onAuthed(res.shop);
       },
-      { ACCOUNT_EXISTS: 'auth_accountExists' },
+      {},
+      true,
     );
   }
 
@@ -127,7 +121,7 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
   return (
     <main className="min-h-screen bg-[#F8FAFC] px-4 py-6">
       <div className="mx-auto flex w-full max-w-sm flex-col gap-4">
-        <LangSwitcher />
+        <LanguageDropdown className="self-end" />
 
         <div className="text-center">
           <h1 className="flex justify-center text-2xl font-extrabold text-[#1E1B4B]">
@@ -137,6 +131,11 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
         </div>
 
         <section className="rounded-2xl border border-[#E2E8F0] bg-white p-6 shadow-sm">
+          {onBack && (
+            <button type="button" className={`${linkClass} mb-3`} onClick={onBack}>
+              {t('auth_back')}
+            </button>
+          )}
           <h2 className="mb-4 text-lg font-bold text-[#1E1B4B]">{t(HEADINGS[mode])}</h2>
 
           <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-4">
@@ -168,6 +167,7 @@ export default function AuthPage({ onAuthed }: { onAuthed: (shop: Shop) => void 
               <p className="rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] p-3 text-xs text-slate-600">{t('auth_privacy')}</p>
             )}
 
+            {duplicate && <DuplicateAccountAlert onGoToLogin={() => switchMode('login')} />}
             {error && (
               <p role="alert" className="text-sm font-semibold text-[#DC2626]">
                 {error}

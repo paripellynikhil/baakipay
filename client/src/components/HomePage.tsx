@@ -20,6 +20,24 @@ interface HomePageProps {
   onOpenCustomers: () => void;
 }
 
+const SPARK_W = 120;
+const SPARK_H = 32;
+
+// Maps a balance series onto the sparkline box, first point at left, last at right.
+function buildSparkPath(values: number[]): string {
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+  const step = SPARK_W / (values.length - 1);
+  return values
+    .map((v, i) => {
+      const x = (i * step).toFixed(1);
+      const y = (SPARK_H - 2 - ((v - min) / range) * (SPARK_H - 4) + 1).toFixed(1);
+      return `${x},${y}`;
+    })
+    .join(' ');
+}
+
 function isOpen(inv: Invoice): boolean {
   return inv.status === 'UNPAID' || inv.status === 'PARTIAL';
 }
@@ -100,6 +118,9 @@ export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: Home
     setInvoices((prev) => prev.map((inv) => (inv.id === invoiceId ? { ...inv, lastRemindedAt } : inv)));
   }
 
+  const sparkBalances = forecast?.points.map((p) => p.balance).filter((b) => Number.isFinite(b)) ?? [];
+  const sparkPath = sparkBalances.length >= 2 ? buildSparkPath(sparkBalances) : null;
+
   if (loading) {
     return (
       <div className="flex flex-col gap-4 p-4">
@@ -140,6 +161,24 @@ export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: Home
             <p className={forecast.hasCashGap ? 'font-semibold text-[#DC2626]' : 'text-slate-600'}>
               {forecast.hasCashGap ? t('forecast.cash_gap_alert') : t('forecast.no_gap')}
             </p>
+            {sparkPath && (
+              <svg width={SPARK_W} height={SPARK_H} viewBox={`0 0 ${SPARK_W} ${SPARK_H}`} className="mt-1" aria-hidden="true">
+                <defs>
+                  <linearGradient id="forecast-spark-grad" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2={SPARK_W} y2="0">
+                    <stop offset="0" stopColor="#16A34A" />
+                    <stop offset="1" stopColor="#E5484D" />
+                  </linearGradient>
+                </defs>
+                <polyline
+                  points={sparkPath}
+                  fill="none"
+                  stroke="url(#forecast-spark-grad)"
+                  strokeWidth="2"
+                  strokeLinejoin="round"
+                  strokeLinecap="round"
+                />
+              </svg>
+            )}
           </div>
         ) : (
           <p className="mt-2 text-sm text-slate-500">{t('forecast.error')}</p>

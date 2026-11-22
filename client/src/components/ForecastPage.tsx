@@ -19,7 +19,14 @@ const PRO_DAYS = [30, 60, 90];
 const FREE_DAYS = 7;
 const DEFAULT_TOGGLES: WhatIfToggles = { delayTop: false, badDay5: false, extraCredit15k: false };
 
-export default function ForecastPage() {
+export type ForecastView = 'forecast' | 'health';
+
+interface ForecastPageProps {
+  view: ForecastView;
+  onViewChange: (view: ForecastView) => void;
+}
+
+export default function ForecastPage({ view, onViewChange }: ForecastPageProps) {
   const { t } = useI18n();
   const [days, setDays] = useState(30);
   const [toggles, setToggles] = useState<WhatIfToggles>(DEFAULT_TOGGLES);
@@ -27,7 +34,6 @@ export default function ForecastPage() {
   const [offline, setOffline] = useState(false);
   const [loading, setLoading] = useState(true);
   const [failed, setFailed] = useState(false);
-  const [view, setView] = useState<'forecast' | 'health'>('forecast');
 
   const { delayTop, badDay5, extraCredit15k } = toggles;
   // Lock state is known only after a response; the server reports the effective plan.
@@ -73,7 +79,7 @@ export default function ForecastPage() {
               key={key}
               type="button"
               aria-pressed={active}
-              onClick={() => setView(key)}
+              onClick={() => onViewChange(key)}
               className={`inline-flex min-h-[44px] items-center gap-1 rounded-xl px-3 text-sm font-semibold ${
                 active ? 'bg-[#1E1B4B] text-white' : 'border border-[#E2E8F0] bg-white text-[#1E1B4B]'
               }`}

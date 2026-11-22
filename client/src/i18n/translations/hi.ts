@@ -18,6 +18,7 @@ export const hiCore = {
   auth_toSignup: 'नई दुकान? खाता बनाएं', auth_toLogin: 'पहले से पंजीकृत हैं? लॉग इन करें', auth_forgotLink: 'पासवर्ड भूल गए?',
   auth_backToLogin: 'लॉग इन पर वापस जाएं', auth_sandboxHint: 'सैंडबॉक्स मोड — OTP उपयोग करें: 123456', auth_otpSent: 'पंजीकृत फ़ोन/ईमेल पर OTP भेजा गया',
   auth_invalidCredentials: 'मोबाइल/ईमेल या पासवर्ड गलत है।', auth_accountExists: 'इस मोबाइल/ईमेल से खाता पहले से मौजूद है।',
+  auth_back: '← वापस', auth_duplicate_account: 'इस ईमेल या मोबाइल नंबर से पहले से एक खाता पंजीकृत है। कृपया इसके बजाय लॉगिन करें।', auth_go_to_login: 'लॉगिन पर जाएं',
   auth_notFound: 'इस मोबाइल/ईमेल के लिए कोई खाता नहीं मिला।', auth_invalidOtp: 'OTP गलत है। सैंडबॉक्स मोड में 123456 उपयोग करें।',
   auth_minPassword: 'पासवर्ड कम से कम 8 अक्षरों का होना चाहिए।', auth_required: 'यह फ़ील्ड ज़रूरी है।',
   auth_resetDone: 'पासवर्ड अपडेट हो गया। कृपया लॉग इन करें।',

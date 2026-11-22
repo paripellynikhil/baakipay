@@ -18,6 +18,7 @@ export const enCore = {
   auth_toSignup: 'New shop? Create account', auth_toLogin: 'Already registered? Log in', auth_forgotLink: 'Forgot password?',
   auth_backToLogin: 'Back to login', auth_sandboxHint: 'Sandbox mode — Use OTP: 123456', auth_otpSent: 'OTP sent to registered phone/email',
   auth_invalidCredentials: 'Wrong mobile/email or password.', auth_accountExists: 'An account with this mobile/email already exists.',
+  auth_back: '← Back', auth_duplicate_account: 'An account is already registered with this email or mobile number. Please log in instead.', auth_go_to_login: 'Go to Login',
   auth_notFound: 'No account found for this mobile/email.', auth_invalidOtp: 'Incorrect OTP. Use 123456 in sandbox mode.',
   auth_minPassword: 'Password must be at least 8 characters.', auth_required: 'This field is required.',
   auth_resetDone: 'Password updated. Please log in.',

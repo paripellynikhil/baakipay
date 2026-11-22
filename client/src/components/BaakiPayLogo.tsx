@@ -1,22 +1,25 @@
 type BaakiPayLogoProps = {
   variant?: 'light' | 'dark';
   showWordmark?: boolean;
+  size?: 'sm' | 'lg';
   className?: string;
 };
 
 export function BaakiPayLogo({
   variant = 'light',
   showWordmark = true,
+  size = 'sm',
   className = '',
 }: BaakiPayLogoProps) {
   const isDark = variant === 'dark';
+  const px = size === 'lg' ? '40' : '32';
 
   return (
     <div className={`flex items-center gap-2 ${className}`.trim()}>
       <svg
         viewBox="0 0 100 100"
-        width="32"
-        height="32"
+        width={px}
+        height={px}
         aria-hidden="true"
         className="shrink-0"
       >
@@ -45,7 +48,7 @@ export function BaakiPayLogo({
         <path d="M62 76 H74 V69 L87 79 L74 89 V82 H62 Z" fill="#F59E0B" />
       </svg>
       {showWordmark && (
-        <span className="text-lg font-bold">
+        <span className={`${size === 'lg' ? 'text-xl' : 'text-lg'} font-bold`}>
           Baaki
           <span className="text-[#F59E0B]">Pay</span>
         </span>

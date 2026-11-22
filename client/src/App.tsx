@@ -6,6 +6,7 @@ import { I18nProvider, useI18n } from './i18n/I18n';
 import { ApiError, clearSession, getToken } from './lib/api';
 import { getProfile, type Shop } from './lib/shopApi';
 import AuthPage from './pages/AuthPage';
+import LandingPage from './pages/LandingPage';
 import OnboardingPage from './pages/OnboardingPage';
 
 type Phase = 'loading' | 'auth' | 'retry' | 'ready';
@@ -16,6 +17,8 @@ function AppInner() {
   const [offline, setOffline] = useState(false);
   const [phase, setPhase] = useState<Phase>(() => (getToken() ? 'loading' : 'auth'));
   const [activeTab, setActiveTab] = useState<TabId>('home');
+  // Logged-out gate: null = show LandingPage; 'login' | 'register' = show AuthPage in that mode.
+  const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
 
   const loadProfile = useCallback(async () => {
     setPhase('loading');
@@ -52,6 +55,7 @@ function AppInner() {
     clearSession();
     setShop(null);
     setActiveTab('home');
+    setAuthMode(null);
     setPhase('auth');
   }
 
@@ -85,7 +89,21 @@ function AppInner() {
   }
 
   if (phase === 'auth' || !shop) {
-    return <AuthPage onAuthed={handleAuthed} />;
+    if (authMode === null) {
+      return (
+        <LandingPage
+          onLogin={() => setAuthMode('login')}
+          onStartTrial={() => setAuthMode('register')}
+        />
+      );
+    }
+    return (
+      <AuthPage
+        onAuthed={handleAuthed}
+        initialMode={authMode}
+        onBack={() => setAuthMode(null)}
+      />
+    );
   }
 
   if (!shop.onboarded) {

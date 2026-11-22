@@ -4,7 +4,7 @@ import InvoiceDrawer from './InvoiceDrawer';
 import InvoiceProofModal, { type ProofShop } from './InvoiceProofModal';
 import WhatsAppModal from './WhatsAppModal';
 import HomePage from './HomePage';
-import ForecastPage from './ForecastPage';
+import ForecastPage, { type ForecastView } from './ForecastPage';
 import CustomersPage from '../pages/CustomersPage';
 import ExpensesPage from '../pages/ExpensesPage';
 import SettingsPage from './SettingsPage';
@@ -43,6 +43,13 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
   const [proof, setProof] = useState<ProofState | null>(null);
   const [whatsapp, setWhatsapp] = useState<WhatsAppState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // Lifted from ForecastPage so Layout can render the Business Health breadcrumb.
+  const [forecastView, setForecastView] = useState<ForecastView>('forecast');
+
+  // Leaving the Future Cash tab resets it, matching the previous remount behaviour.
+  useEffect(() => {
+    if (activeTab !== 'future') setForecastView('forecast');
+  }, [activeTab]);
 
   // Auto-dismiss the red error notice.
   useEffect(() => {
@@ -105,11 +112,12 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
         onTabChange={onTabChange}
         onAddBill={() => openDrawer(null)}
         onLogout={onLogout}
+        forecastView={forecastView}
       >
         {activeTab === 'home' ? (
           <HomePage shop={shop} onOpenForecast={() => onTabChange('future')} onOpenCustomers={() => onTabChange('customers')} />
         ) : activeTab === 'future' ? (
-          <ForecastPage />
+          <ForecastPage view={forecastView} onViewChange={setForecastView} />
         ) : activeTab === 'customers' ? (
           <CustomersPage onAddBill={(c) => openDrawer(c)} onWhatsApp={(c) => void handleWhatsApp(c)} />
         ) : activeTab === 'bills' ? (

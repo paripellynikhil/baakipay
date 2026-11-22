@@ -11,8 +11,10 @@ import {
 } from 'lucide-react';
 import BaakiPayLogo from './BaakiPayLogo';
 import Breadcrumbs from './Breadcrumbs';
+import LanguageDropdown from './LanguageDropdown';
+import type { ForecastView } from './ForecastPage';
 import { useI18n } from '../i18n/I18n';
-import type { Lang, TranslationKey } from '../i18n/translations';
+import type { TranslationKey } from '../i18n/translations';
 
 export type TabId = 'home' | 'customers' | 'future' | 'bills' | 'settings';
 
@@ -26,12 +28,6 @@ const TABS: { id: TabId; labelKey: TranslationKey; icon: LucideIcon }[] = [
 
 const PHONE_TABS = TABS.filter((tab) => tab.id !== 'settings');
 
-const LANG_BUTTONS: { code: Lang; label: string }[] = [
-  { code: 'en', label: 'EN' },
-  { code: 'te', label: 'తె' },
-  { code: 'hi', label: 'हि' },
-];
-
 interface LayoutProps {
   shopName: string;
   offline: boolean;
@@ -39,33 +35,8 @@ interface LayoutProps {
   onTabChange: (tab: TabId) => void;
   onAddBill: () => void;
   onLogout: () => void;
+  forecastView?: ForecastView;
   children: ReactNode;
-}
-
-function LangSwitcher() {
-  const { lang, setLang } = useI18n();
-  return (
-    <div className="flex items-center gap-1">
-      {LANG_BUTTONS.map((btn) => {
-        const active = lang === btn.code;
-        return (
-          <button
-            key={btn.code}
-            type="button"
-            aria-pressed={active}
-            onClick={() => setLang(btn.code)}
-            className={`min-h-[44px] min-w-[44px] rounded-xl px-2 text-sm font-semibold ${
-              active
-                ? 'bg-[#1E1B4B] text-white ring-2 ring-white lg:ring-0'
-                : 'bg-white border border-[#E2E8F0] text-[#1E1B4B]'
-            }`}
-          >
-            {btn.label}
-          </button>
-        );
-      })}
-    </div>
-  );
 }
 
 export default function Layout({
@@ -75,16 +46,19 @@ export default function Layout({
   onTabChange,
   onAddBill,
   onLogout,
+  forecastView = 'forecast',
   children,
 }: LayoutProps) {
   const { t } = useI18n();
+  // Business Health lives inside the Future Cash tab; show it as a third breadcrumb segment.
+  const showHealthCrumb = activeTab === 'future' && forecastView === 'health';
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col gap-4 bg-[#1E1B4B] p-5 text-white">
         <div className="px-1 pt-2">
           <button type="button" onClick={() => onTabChange('home')} className="cursor-pointer">
-            <BaakiPayLogo variant="dark" />
+            <BaakiPayLogo variant="dark" size="lg" />
           </button>
           <p className="mt-1 text-xs text-white/70">{t('tagline')}</p>
         </div>
@@ -125,7 +99,7 @@ export default function Layout({
           </button>
           <p className="min-w-0 flex-1 truncate font-semibold">{shopName}</p>
           <div className="flex items-center gap-2">
-            <LangSwitcher />
+            <LanguageDropdown />
             <button
               type="button"
               onClick={() => onTabChange('settings')}
@@ -156,7 +130,8 @@ export default function Layout({
           {activeTab !== 'home' && (
             <Breadcrumbs
               homeLabel={t('nav_home')}
-              currentLabel={t(TABS.find((tab) => tab.id === activeTab)?.labelKey ?? 'nav_home')}
+              middleLabel={showHealthCrumb ? t('nav_future') : undefined}
+              currentLabel={showHealthCrumb ? t('analytics.pill_health') : t(TABS.find((tab) => tab.id === activeTab)?.labelKey ?? 'nav_home')}
               onHome={() => onTabChange('home')}
             />
           )}
