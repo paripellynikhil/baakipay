@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react';
 import { Field, primaryClass, linkClass } from './FormControls';
 import { LineItemsEditor, newRow, type LineRow } from './LineItemsEditor';
 import { CustomerSelect } from './CustomerSelect';
 import { InvoiceTotals } from './InvoiceTotals';
+import { Toast } from './Toast';
 import { useI18n } from '../i18n/I18n';
 import { ApiError } from '../lib/api';
 import { getCustomers, type Customer } from '../lib/customersApi';
@@ -39,6 +40,8 @@ export default function InvoiceDrawer({ shopId, customer, onClose, onCreated }: 
   const [formError, setFormError] = useState<string | null>(null);
   const [upgradeNeeded, setUpgradeNeeded] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const clearToast = useCallback(() => setToast(null), []);
 
   // Load the customer list and the shop's default due days once on mount.
   useEffect(() => {
@@ -146,7 +149,7 @@ export default function InvoiceDrawer({ shopId, customer, onClose, onCreated }: 
             value={customerId}
             error={customerError}
             onChange={setCustomerId}
-            onAdded={(c) => setCustomers((prev) => [...prev, c])}
+            onAdded={(c) => { setCustomers((prev) => [...prev, c]); setToast(t('customers.added')); }}
           />
 
           <Field
@@ -189,6 +192,7 @@ export default function InvoiceDrawer({ shopId, customer, onClose, onCreated }: 
             </button>
           </div>
         </form>
+        <Toast message={toast} onDone={clearToast} />
       </div>
     </div>
   );

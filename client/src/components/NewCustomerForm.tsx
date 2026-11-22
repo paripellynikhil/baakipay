@@ -1,25 +1,28 @@
-import { useState, type FormEvent } from 'react';
+import { useState, type KeyboardEvent, type MouseEvent } from 'react';
 import { Field, primaryClass, linkClass } from './FormControls';
 import { useI18n } from '../i18n/I18n';
 import { ApiError } from '../lib/api';
 import { createCustomer, type Customer } from '../lib/customersApi';
 
 interface NewCustomerFormProps {
+  initialName?: string;
   onCreated: (customer: Customer) => void;
   onCancel: () => void;
 }
 
 // Inline mini-form: name is required; phone and credit limit are optional.
-export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
+// Rendered inside the invoice drawer's <form>, so it is a <div> and never submits:
+// Save is a type="button" click handler and Enter in any input is swallowed.
+export function NewCustomerForm({ initialName = '', onCreated, onCancel }: NewCustomerFormProps) {
   const { t } = useI18n();
-  const [name, setName] = useState('');
+  const [name, setName] = useState(initialName);
   const [phone, setPhone] = useState('');
   const [limit, setLimit] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function handleSave() {
+    if (saving) return;
     setError(null);
     const trimmedName = name.trim();
     const limitText = limit.trim();
@@ -39,12 +42,27 @@ export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
       onCreated(created);
     } catch (err) {
       setSaving(false);
-      setError(err instanceof ApiError && err.code === 'OFFLINE' ? t('networkError') : t('customers.saveError'));
+      if (err instanceof ApiError && err.code === 'OFFLINE') setError(t('networkError'));
+      else if (err instanceof ApiError && err.code !== 'HTTP_ERROR') setError(err.code);
+      else setError(t('customers.saveError'));
     }
   }
 
+  function handleSaveClick(e: MouseEvent<HTMLButtonElement>) {
+    e.preventDefault();
+    e.stopPropagation();
+    void handleSave();
+  }
+
+  function handleEnter(e: KeyboardEvent<HTMLInputElement>) {
+    if (e.key !== 'Enter') return;
+    e.preventDefault();
+    e.stopPropagation();
+    void handleSave();
+  }
+
   return (
-    <form noValidate onSubmit={handleSubmit} className="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-3">
+    <div className="flex flex-col gap-3 rounded-xl border border-[#E2E8F0] p-3">
       <h4 className="text-sm font-bold text-[#1E1B4B]">{t('customers.addTitle')}</h4>
       <Field
         id="newc-name"
@@ -53,6 +71,7 @@ export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
         autoFocus
         autoComplete="off"
         onChange={(e) => setName(e.target.value)}
+        onKeyDown={handleEnter}
       />
       <Field
         id="newc-phone"
@@ -61,6 +80,7 @@ export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
         inputMode="tel"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
+        onKeyDown={handleEnter}
       />
       <Field
         id="newc-limit"
@@ -70,6 +90,7 @@ export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
         min={0}
         value={limit}
         onChange={(e) => setLimit(e.target.value)}
+        onKeyDown={handleEnter}
       />
       {error && (
         <p role="alert" className="text-sm text-red-600">
@@ -77,13 +98,13 @@ export function NewCustomerForm({ onCreated, onCancel }: NewCustomerFormProps) {
         </p>
       )}
       <div className="flex gap-2">
-        <button type="submit" disabled={saving} className={primaryClass}>
+        <button type="button" onClick={handleSaveClick} disabled={saving} className={primaryClass}>
           {saving ? t('customers.saving') : t('customers.save')}
         </button>
         <button type="button" onClick={onCancel} className={linkClass}>
           {t('customers.cancel')}
         </button>
       </div>
-    </form>
+    </div>
   );
 }

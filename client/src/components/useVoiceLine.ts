@@ -1,4 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n/I18n';
+import type { Lang } from '../i18n/translations';
 
 // Minimal typings for the Web Speech API (not present in every TS lib.dom version).
 interface SpeechAlternativeLike {
@@ -23,6 +25,8 @@ interface RecognizerLike {
 }
 type RecognizerCtor = new () => RecognizerLike;
 
+const RECOGNITION_LANG: Record<Lang, string> = { en: 'en-IN', te: 'te-IN', hi: 'hi-IN' };
+
 export function getRecognizerCtor(): RecognizerCtor | null {
   if (typeof window === 'undefined') return null;
   const w = window as unknown as { SpeechRecognition?: RecognizerCtor; webkitSpeechRecognition?: RecognizerCtor };
@@ -30,7 +34,9 @@ export function getRecognizerCtor(): RecognizerCtor | null {
 }
 
 // Wraps one dictation session. Calls onPhrase with each final transcript; toggle() starts or stops.
-export function useVoiceLine(onPhrase: (text: string) => void, onError: () => void) {
+// onError receives the Web Speech error code (e.g. 'not-allowed' when mic permission is denied).
+export function useVoiceLine(onPhrase: (text: string) => void, onError: (code?: string) => void) {
+  const { lang } = useI18n();
   const [listening, setListening] = useState(false);
   const recRef = useRef<RecognizerLike | null>(null);
   const phraseRef = useRef(onPhrase);
@@ -50,7 +56,7 @@ export function useVoiceLine(onPhrase: (text: string) => void, onError: () => vo
     const Ctor = getRecognizerCtor();
     if (!Ctor) return;
     const rec = new Ctor();
-    rec.lang = 'en-IN';
+    rec.lang = RECOGNITION_LANG[lang];
     rec.continuous = false;
     rec.interimResults = false;
     rec.onresult = (e) => {
@@ -61,8 +67,8 @@ export function useVoiceLine(onPhrase: (text: string) => void, onError: () => vo
       }
       if (parts.length > 0) phraseRef.current(parts.join(' '));
     };
-    rec.onerror = () => {
-      errorRef.current();
+    rec.onerror = (e) => {
+      errorRef.current(e.error);
       setListening(false);
     };
     rec.onend = () => {
