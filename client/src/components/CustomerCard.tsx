@@ -1,5 +1,6 @@
 import { useI18n } from '../i18n/I18n';
 import type { Customer } from '../lib/customersApi';
+import InfoTip from './InfoTip';
 
 // Credit-limit bar colour: green under 60%, amber 60–79%, red 80%+.
 export function limitPercent(owed: number, limit: number): number {
@@ -50,17 +51,20 @@ export function CustomerCard({ customer, onAddBill, onGotMoney, onWhatsApp, onOp
       </div>
 
       {(customer.open_invoice_codes ?? []).length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {(customer.open_invoice_codes ?? []).map((code) => (
-            <button
-              key={code}
-              type="button"
-              onClick={() => onOpenInvoice(code)}
-              className="min-h-[28px] rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-[#1E1B4B] underline-offset-2 hover:underline"
-            >
-              {code}
-            </button>
-          ))}
+        <div className="flex items-start gap-2">
+          <div className="flex flex-wrap gap-1">
+            {(customer.open_invoice_codes ?? []).map((code) => (
+              <button
+                key={code}
+                type="button"
+                onClick={() => onOpenInvoice(code)}
+                className="min-h-[28px] rounded-full border border-[#F59E0B] bg-amber-50 px-2 py-0.5 text-xs font-bold text-[#1E1B4B] underline-offset-2 hover:bg-[#F59E0B] hover:underline"
+              >
+                {code} ↗
+              </button>
+            ))}
+          </div>
+          <InfoTip text={t('info.customers_invoices')} label={t('info.help_label')} />
         </div>
       )}
 

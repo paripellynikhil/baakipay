@@ -12,17 +12,20 @@ import { landing } from './sections/landing';
 import { invoiceQuick } from './sections/invoiceQuick';
 import { customerStatement } from './sections/customerStatement';
 import { settingsUpgrade } from './sections/settingsUpgrade';
+import { pricing } from './sections/pricing';
+import { home } from './sections/home';
+import { infoTips } from './sections/infoTips';
 
 // Barrel: keeps the public export names stable so existing imports of './translations' still resolve.
 export const LANGS = ['en', 'te', 'hi'] as const;
 export type Lang = (typeof LANGS)[number];
 
-export const en = { ...enCore, ...gotMoney.en, ...sms.en, ...bills.en, ...forecast.en, ...forecastCash.en, ...analytics.en, ...settings.en, ...landing.en, ...invoiceQuick.en, ...customerStatement.en, ...settingsUpgrade.en } as const;
+export const en = { ...enCore, ...gotMoney.en, ...sms.en, ...bills.en, ...forecast.en, ...forecastCash.en, ...analytics.en, ...settings.en, ...landing.en, ...invoiceQuick.en, ...customerStatement.en, ...settingsUpgrade.en, ...pricing.en, ...home.en, ...infoTips.en } as const;
 
 export type TranslationKey = keyof typeof en;
 
 export const translations: Record<Lang, Record<TranslationKey, string>> = {
   en,
-  te: { ...teCore, ...gotMoney.te, ...sms.te, ...bills.te, ...forecast.te, ...forecastCash.te, ...analytics.te, ...settings.te, ...landing.te, ...invoiceQuick.te, ...customerStatement.te, ...settingsUpgrade.te },
-  hi: { ...hiCore, ...gotMoney.hi, ...sms.hi, ...bills.hi, ...forecast.hi, ...forecastCash.hi, ...analytics.hi, ...settings.hi, ...landing.hi, ...invoiceQuick.hi, ...customerStatement.hi, ...settingsUpgrade.hi },
+  te: { ...teCore, ...gotMoney.te, ...sms.te, ...bills.te, ...forecast.te, ...forecastCash.te, ...analytics.te, ...settings.te, ...landing.te, ...invoiceQuick.te, ...customerStatement.te, ...settingsUpgrade.te, ...pricing.te, ...home.te, ...infoTips.te },
+  hi: { ...hiCore, ...gotMoney.hi, ...sms.hi, ...bills.hi, ...forecast.hi, ...forecastCash.hi, ...analytics.hi, ...settings.hi, ...landing.hi, ...invoiceQuick.hi, ...customerStatement.hi, ...settingsUpgrade.hi, ...pricing.hi, ...home.hi, ...infoTips.hi },
 };

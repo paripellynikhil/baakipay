@@ -132,8 +132,6 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
             })}
           </div>
 
-          <SafeBufferControl value={buffer} onChange={changeBuffer} />
-
           {offline && <p className="text-xs text-slate-500">{t('offlineBanner')}</p>}
           {isFree && <p className="text-sm text-slate-600">{t('forecast.pro_lock')}</p>}
 
@@ -162,36 +160,54 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
                 </p>
               )}
 
-              <div className="soft-brutal-card rounded-2xl border border-[#E2E8F0] bg-white p-3">
-                <ForecastChart points={data.points} simulated={sim?.points ?? null} buffer={buffer} />
-              </div>
+              <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+                <div className="flex flex-col gap-3 lg:col-span-7">
+                  <div className="soft-brutal-card rounded-2xl border border-[#E2E8F0] bg-white p-3">
+                    <ForecastChart points={data.points} simulated={sim?.points ?? null} buffer={buffer} />
+                  </div>
+                  <SafeBufferControl value={buffer} onChange={changeBuffer} />
+                </div>
 
-              <div
-                role="status"
-                className={`soft-brutal-card flex flex-col gap-1 rounded-2xl border p-4 ${
-                  red ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
-                }`}
-              >
-                <p className={`text-sm font-bold ${red ? 'text-[#DC2626]' : 'text-[#16A34A]'}`}>
-                  {scenario && sim
-                    ? scenario.short
-                      ? fillTemplate(t('forecast.whatif_short'), {
-                          shortfall: inr(scenario.shortfall),
-                          date: sim.lowestDate,
-                          extra: inr(scenario.extra),
-                        })
-                      : fillTemplate(t('forecast.whatif_ok'), {
-                          lowest: inr(sim.lowestBalance),
-                          diff: inr(scenario.diff),
-                        })
-                    : hasGap
-                      ? t('forecast.cash_gap_alert')
-                      : t('forecast.no_gap')}
-                </p>
-                <p className="text-sm text-slate-700">
-                  {t('forecast.lowest_cash')}: <strong>{formatRupees(data.lowestBalance)}</strong> · {t('forecast.lowest_on')}{' '}
-                  {data.lowestDate}
-                </p>
+                <div
+                  role="status"
+                  className={`soft-brutal-card flex flex-col gap-3 rounded-2xl border p-4 lg:col-span-5 ${
+                    red ? 'border-red-200 bg-red-50' : 'border-green-200 bg-green-50'
+                  }`}
+                >
+                  <p className={`text-sm font-bold ${red ? 'text-[#DC2626]' : 'text-[#16A34A]'}`}>
+                    {red ? t('forecast.card_gap') : t('forecast.card_safe')}
+                  </p>
+                  <div>
+                    <p className="text-xs font-semibold text-slate-500">{t('forecast.lowest_cash')}</p>
+                    <p className="text-3xl font-extrabold text-[#1E1B4B]">
+                      {formatRupees(scenario && sim ? sim.lowestBalance : data.lowestBalance)}
+                    </p>
+                    <p className="text-xs text-slate-500">
+                      {t('forecast.lowest_on')} {scenario && sim ? sim.lowestDate : data.lowestDate}
+                    </p>
+                  </div>
+                  <p className="text-sm text-slate-700">
+                    {scenario && sim
+                      ? scenario.short
+                        ? fillTemplate(t('forecast.card_whatif_short'), {
+                            shortfall: inr(scenario.shortfall),
+                            date: sim.lowestDate,
+                            extra: inr(scenario.extra),
+                          })
+                        : fillTemplate(t('forecast.card_whatif_ok'), { lowest: inr(sim.lowestBalance) })
+                      : hasGap
+                        ? fillTemplate(t('forecast.card_normal_short'), {
+                            shortfall: inr(Math.max(0, buffer - data.lowestBalance)),
+                            date: data.lowestDate,
+                          })
+                        : fillTemplate(t('forecast.card_normal_ok'), { lowest: inr(data.lowestBalance) })}
+                  </p>
+                  {scenario && sim && (
+                    <p className="self-start rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#1E1B4B]">
+                      {fillTemplate(t('forecast.card_pill'), { base: inr(data.lowestBalance), sim: inr(sim.lowestBalance) })}
+                    </p>
+                  )}
+                </div>
               </div>
 
               {data.noExpenses && (
@@ -202,8 +218,6 @@ export default function ForecastPage({ view, onViewChange }: ForecastPageProps) 
                 available={data.whatIfAvailable}
                 toggles={toggles}
                 onChange={setToggles}
-                normalLowest={data.lowestBalance}
-                simLowest={sim?.lowestBalance ?? null}
               />
             </>
           )}

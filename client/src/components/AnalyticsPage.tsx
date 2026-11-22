@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { HealthPdfModal } from './HealthPdfModal';
+import InfoTip from './InfoTip';
 import { buildSmartTips } from './analyticsTips';
 import { SkeletonList } from './Skeletons';
 import { useI18n } from '../i18n/I18n';
@@ -65,7 +66,7 @@ export function AnalyticsPage() {
   if (!data) return null;
 
   const kpis = [
-    { label: t('analytics.kpi_on_time'), value: `${data.onTimeRate}%` },
+    { label: t('analytics.kpi_on_time'), value: `${data.onTimeRate}%`, tip: 'info.ontime' as const },
     { label: t('analytics.kpi_avg_days'), value: String(data.avgDaysToCollect) },
     { label: t('analytics.kpi_outstanding'), value: formatRupees(data.totalOutstanding) },
   ];
@@ -83,7 +84,10 @@ export function AnalyticsPage() {
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {kpis.map((k) => (
           <div key={k.label} className="soft-brutal-card rounded-xl border border-[#E2E8F0] bg-white p-4">
-            <p className="text-xs font-semibold text-[#64748B]">{k.label}</p>
+            <div className="flex items-center gap-1">
+              <p className="text-xs font-semibold text-[#64748B]">{k.label}</p>
+              {k.tip && <InfoTip text={t(k.tip)} />}
+            </div>
             <p className="mt-1 text-2xl font-bold text-[#1E1B4B]">{k.value}</p>
           </div>
         ))}

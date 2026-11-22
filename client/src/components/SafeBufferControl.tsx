@@ -43,6 +43,7 @@ export default function SafeBufferControl({ value, onChange }: SafeBufferControl
           />
         </label>
       </div>
+      <p className="text-xs text-slate-500">{t('forecast.buffer_help')}</p>
     </div>
   );
 }

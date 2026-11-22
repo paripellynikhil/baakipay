@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import InfoTip from './InfoTip';
 import WhatsAppModal from './WhatsAppModal';
 import { useI18n } from '../i18n/I18n';
 import { formatRupees } from '../lib/invoiceMath';
@@ -22,7 +23,10 @@ export default function HomeReminderQueue({ rows, shopName, onReminded }: Props)
 
   return (
     <section className="flex flex-col gap-2">
-      <h2 className="text-sm font-bold text-[#1E1B4B]">{t('home.reminder_queue_title')}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-sm font-bold text-[#1E1B4B]">{t('home.reminder_queue_title')}</h2>
+        <InfoTip text={t('info.home_reminders')} />
+      </div>
       {rows.length === 0 ? (
         <p className="rounded-2xl bg-white p-4 text-sm text-slate-500 shadow-sm">{t('home.reminder_empty')}</p>
       ) : (

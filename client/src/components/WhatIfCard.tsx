@@ -1,6 +1,6 @@
+import InfoTip from './InfoTip';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
-import { formatRupees } from '../lib/invoiceMath';
 
 export interface WhatIfToggles {
   delayTop: boolean;
@@ -12,8 +12,6 @@ export interface WhatIfCardProps {
   available: boolean;
   toggles: WhatIfToggles;
   onChange: (next: WhatIfToggles) => void;
-  normalLowest: number;
-  simLowest: number | null;
   onUpgrade?: () => void;
 }
 
@@ -23,7 +21,7 @@ const TOGGLE_ROWS: { key: keyof WhatIfToggles; label: TranslationKey }[] = [
   { key: 'extraCredit15k', label: 'forecast.whatif_extra_credit' },
 ];
 
-export default function WhatIfCard({ available, toggles, onChange, normalLowest, simLowest, onUpgrade }: WhatIfCardProps) {
+export default function WhatIfCard({ available, toggles, onChange, onUpgrade }: WhatIfCardProps) {
   const { t } = useI18n();
 
   if (!available) {
@@ -43,7 +41,10 @@ export default function WhatIfCard({ available, toggles, onChange, normalLowest,
 
   return (
     <div className="flex flex-col gap-3 rounded-2xl border border-[#E2E8F0] bg-white p-4">
-      <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">{t('forecast.whatif_title')}</h2>
+      <div className="flex items-center gap-2">
+        <h2 className="text-sm font-bold uppercase tracking-wide text-slate-500">{t('forecast.whatif_title')}</h2>
+        <InfoTip text={t('info.whatif')} />
+      </div>
 
       {TOGGLE_ROWS.map(({ key, label }) => (
         <div key={key} className="flex flex-col">
@@ -69,17 +70,6 @@ export default function WhatIfCard({ available, toggles, onChange, normalLowest,
           )}
         </div>
       ))}
-
-      <div className="grid grid-cols-2 gap-3 border-t border-[#E2E8F0] pt-3">
-        <div>
-          <p className="text-xs font-semibold text-slate-500">{t('forecast.normal_vs_sim')}</p>
-          <p className="text-base font-bold text-[#1E1B4B]">{formatRupees(normalLowest)}</p>
-        </div>
-        <div>
-          <p className="text-xs font-semibold text-slate-500">{t('forecast.lowest_cash')}</p>
-          <p className="text-base font-bold text-[#F59E0B]">{simLowest === null ? '—' : formatRupees(simLowest)}</p>
-        </div>
-      </div>
     </div>
   );
 }

@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   LayoutDashboard,
   Users,
@@ -12,9 +12,11 @@ import {
 import BaakiPayLogo from './BaakiPayLogo';
 import Breadcrumbs from './Breadcrumbs';
 import LanguageDropdown from './LanguageDropdown';
+import PricingCompareModal from './PricingCompareModal';
 import type { ForecastView } from './ForecastPage';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
+import { trialDaysLeft } from '../lib/shopApi';
 
 export type TabId = 'home' | 'customers' | 'future' | 'bills' | 'settings';
 
@@ -36,6 +38,7 @@ interface LayoutProps {
   onAddBill: () => void;
   onLogout: () => void;
   forecastView?: ForecastView;
+  trialExpiresAt?: string | null;
   children: ReactNode;
 }
 
@@ -47,9 +50,12 @@ export default function Layout({
   onAddBill,
   onLogout,
   forecastView = 'forecast',
+  trialExpiresAt,
   children,
 }: LayoutProps) {
   const { t } = useI18n();
+  const [planOpen, setPlanOpen] = useState(false);
+  const daysLeft = trialDaysLeft(trialExpiresAt);
   // Business Health lives inside the Future Cash tab; show it as a third breadcrumb segment.
   const showHealthCrumb = activeTab === 'future' && forecastView === 'health';
 
@@ -90,6 +96,18 @@ export default function Layout({
             );
           })}
         </nav>
+        <div className="mt-auto flex flex-wrap items-center gap-2 border-t border-white/10 pt-4">
+          <button
+            type="button"
+            onClick={() => setPlanOpen(true)}
+            className="inline-flex min-h-[44px] items-center rounded-xl border border-white/20 px-4 text-sm font-semibold text-white hover:bg-white/10"
+          >
+            {t('pricing.plan_button')}
+          </button>
+          {daysLeft !== null && daysLeft > 0 && (
+            <span className="rounded-full bg-[#F59E0B] px-2.5 py-1 text-xs font-bold text-[#0F172A]">{t('pricing.days_left').replace('{n}', String(daysLeft))}</span>
+          )}
+        </div>
       </aside>
 
       <div className="flex min-h-screen flex-col lg:ml-[240px]">
@@ -147,6 +165,8 @@ export default function Layout({
         <Plus size={18} aria-hidden="true" />
         {t('addBill')}
       </button>
+
+      {planOpen && <PricingCompareModal onClose={() => setPlanOpen(false)} />}
 
       <nav className="fixed bottom-0 left-0 right-0 z-30 grid grid-cols-4 border-t border-[#E2E8F0] bg-white lg:hidden">
         {PHONE_TABS.map(({ id, labelKey, icon: Icon }) => {

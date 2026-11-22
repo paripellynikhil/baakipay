@@ -31,6 +31,13 @@ export interface ProfileResult {
   effectivePlan: EffectivePlan;
 }
 
+// Whole days left in the trial, rounded up. Null when the date is missing or invalid; 0 once it has passed.
+export function trialDaysLeft(expiresAt: string | null | undefined, now = Date.now()): number | null {
+  const end = Date.parse(expiresAt ?? '');
+  if (Number.isNaN(end)) return null;
+  return Math.max(0, Math.ceil((end - now) / 86_400_000));
+}
+
 export interface RecurringBillInput {
   title: string;
   category: string;

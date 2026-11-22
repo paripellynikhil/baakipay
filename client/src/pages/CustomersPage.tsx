@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AddCustomerModal } from '../components/AddCustomerModal';
+import InfoTip from '../components/InfoTip';
 import { SmsMatchModal } from '../components/SmsMatchModal';
 import { CustomerCard } from '../components/CustomerCard';
 import { CustomerDocModals } from '../components/CustomerDocModals';
@@ -91,6 +92,7 @@ export default function CustomersPage({ onAddBill, onWhatsApp }: CustomersPagePr
           >
             {t('sms.title')}
           </button>
+          <InfoTip text={t('info.customers_sms')} />
           <button
             type="button"
             onClick={() => setAdding(true)}

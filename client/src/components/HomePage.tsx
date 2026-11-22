@@ -135,13 +135,16 @@ export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: Home
       <h1 className="text-xl font-bold text-[#1E1B4B]">{t('home.section_title')}</h1>
       {loadError && <p className="rounded-xl bg-[#FEE2E2] p-3 text-sm text-[#991B1B]">{t('networkError')}</p>}
       {creditWarn && (
-        <button
-          type="button"
-          onClick={onOpenCustomers}
-          className="cursor-pointer rounded-xl bg-[#FEF3C7] p-3 text-left text-sm text-[#92400E]"
-        >
-          {t('home.credit_warning')}
-        </button>
+        <div className="soft-brutal-card flex items-center justify-between gap-3 rounded-xl bg-[#FEF3C7] p-3 text-sm text-[#92400E]">
+          <span>{t('home.credit_warning')}</span>
+          <button
+            type="button"
+            onClick={onOpenCustomers}
+            className="shrink-0 rounded-full bg-[#1E1B4B] px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            {t('home.view_customers')}
+          </button>
+        </div>
       )}
 
       <HomeKpis cashInHand={toNum(shop.cash_in_hand)} toCollect={toCollect} upcomingBills={upcomingBills} />
@@ -149,8 +152,12 @@ export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: Home
       <section className="soft-brutal-card rounded-2xl bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-bold text-[#1E1B4B]">{t('home.forecast_preview')}</h2>
-          <button type="button" onClick={onOpenForecast} className="text-xs font-semibold text-[#16A34A]">
-            {t('forecast.view_full')}
+          <button
+            type="button"
+            onClick={onOpenForecast}
+            className="shrink-0 rounded-lg border border-[#1E1B4B] bg-white px-3 py-1.5 text-xs font-semibold text-[#1E1B4B]"
+          >
+            {t('home.view_full_forecast')}
           </button>
         </div>
         {forecast ? (

@@ -1,3 +1,4 @@
+import InfoTip from './InfoTip';
 import { useI18n } from '../i18n/I18n';
 import { formatRupees } from '../lib/invoiceMath';
 import type { AnalyticsResponse } from '../lib/analyticsApi';
@@ -68,7 +69,12 @@ export function HealthPdfModal({
           </section>
 
           <section>
-            <p className="text-xs uppercase tracking-wide text-slate-500">{t('analytics.pdf_hash')}</p>
+            <div className="flex items-center gap-2">
+              <p className="text-xs uppercase tracking-wide text-slate-500">{t('analytics.pdf_hash')}</p>
+              <span className="print:hidden">
+                <InfoTip text={t('info.hash')} />
+              </span>
+            </div>
             <p className="font-mono text-xs break-all">{data.summaryHash}</p>
           </section>
 

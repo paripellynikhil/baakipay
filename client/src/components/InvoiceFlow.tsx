@@ -20,6 +20,8 @@ interface InvoiceFlowProps {
   offline: boolean;
   activeTab: TabId;
   onTabChange: (tab: TabId) => void;
+  forecastView: ForecastView;
+  onForecastViewChange: (view: ForecastView) => void;
   onLogout: () => void;
 }
 
@@ -35,7 +37,15 @@ interface WhatsAppState {
   invoice: Invoice;
 }
 
-export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onLogout }: InvoiceFlowProps) {
+export default function InvoiceFlow({
+  shop,
+  offline,
+  activeTab,
+  onTabChange,
+  forecastView,
+  onForecastViewChange,
+  onLogout,
+}: InvoiceFlowProps) {
   const { t } = useI18n();
   const shopName = shop.shop_name ?? t('appName');
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -43,13 +53,6 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
   const [proof, setProof] = useState<ProofState | null>(null);
   const [whatsapp, setWhatsapp] = useState<WhatsAppState | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  // Lifted from ForecastPage so Layout can render the Business Health breadcrumb.
-  const [forecastView, setForecastView] = useState<ForecastView>('forecast');
-
-  // Leaving the Future Cash tab resets it, matching the previous remount behaviour.
-  useEffect(() => {
-    if (activeTab !== 'future') setForecastView('forecast');
-  }, [activeTab]);
 
   // Auto-dismiss the red error notice.
   useEffect(() => {
@@ -113,11 +116,12 @@ export default function InvoiceFlow({ shop, offline, activeTab, onTabChange, onL
         onAddBill={() => openDrawer(null)}
         onLogout={onLogout}
         forecastView={forecastView}
+        trialExpiresAt={shop.trial_expires_at}
       >
         {activeTab === 'home' ? (
           <HomePage shop={shop} onOpenForecast={() => onTabChange('future')} onOpenCustomers={() => onTabChange('customers')} />
         ) : activeTab === 'future' ? (
-          <ForecastPage view={forecastView} onViewChange={setForecastView} />
+          <ForecastPage view={forecastView} onViewChange={onForecastViewChange} />
         ) : activeTab === 'customers' ? (
           <CustomersPage onAddBill={(c) => openDrawer(c)} onWhatsApp={(c) => void handleWhatsApp(c)} />
         ) : activeTab === 'bills' ? (

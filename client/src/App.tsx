@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { type TabId } from './components/Layout';
+import { type ForecastView } from './components/ForecastPage';
 import InvoiceFlow from './components/InvoiceFlow';
 import { SkeletonCard } from './components/Skeletons';
 import { I18nProvider, useI18n } from './i18n/I18n';
@@ -11,12 +12,27 @@ import OnboardingPage from './pages/OnboardingPage';
 
 type Phase = 'loading' | 'auth' | 'retry' | 'ready';
 
+const TAB_IDS: TabId[] = ['home', 'customers', 'future', 'bills', 'settings'];
+
+// '#future/health' selects the Business Health sub-view; empty or unknown hashes fall back to home.
+function parseHash(hash: string): { tab: TabId; view: ForecastView } {
+  const [name, sub] = hash.replace(/^#/, '').split('/');
+  const tab = TAB_IDS.find((id) => id === name) ?? 'home';
+  return { tab, view: tab === 'future' && sub === 'health' ? 'health' : 'forecast' };
+}
+
+function hashFor(tab: TabId, view: ForecastView): string {
+  return tab === 'future' && view === 'health' ? '#future/health' : `#${tab}`;
+}
+
 function AppInner() {
   const { t } = useI18n();
   const [shop, setShop] = useState<Shop | null>(null);
   const [offline, setOffline] = useState(false);
   const [phase, setPhase] = useState<Phase>(() => (getToken() ? 'loading' : 'auth'));
-  const [activeTab, setActiveTab] = useState<TabId>('home');
+  const [initialView] = useState(() => parseHash(window.location.hash));
+  const [activeTab, setActiveTab] = useState<TabId>(initialView.tab);
+  const [forecastView, setForecastView] = useState<ForecastView>(initialView.view);
   // Logged-out gate: null = show LandingPage; 'login' | 'register' = show AuthPage in that mode.
   const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
 
@@ -44,6 +60,30 @@ function AppInner() {
   useEffect(() => {
     if (getToken()) void loadProfile();
   }, [loadProfile]);
+
+  // Leaving the Future Cash tab resets the Business Health sub-view.
+  useEffect(() => {
+    if (activeTab !== 'future') setForecastView('forecast');
+  }, [activeTab]);
+
+  // Mirror the current view into the URL hash; replace on first load, push afterwards so back/forward work.
+  useEffect(() => {
+    const next = hashFor(activeTab, forecastView);
+    if (window.location.hash === next) return;
+    if (window.location.hash === '') window.history.replaceState(null, '', next);
+    else window.history.pushState(null, '', next);
+  }, [activeTab, forecastView]);
+
+  // Back/forward (and manual hash edits) re-select the view.
+  useEffect(() => {
+    function onHashChange() {
+      const { tab, view } = parseHash(window.location.hash);
+      setActiveTab(tab);
+      setForecastView(view);
+    }
+    window.addEventListener('hashchange', onHashChange);
+    return () => window.removeEventListener('hashchange', onHashChange);
+  }, []);
 
   function handleAuthed(next: Shop) {
     setShop(next);
@@ -116,6 +156,8 @@ function AppInner() {
       offline={offline}
       activeTab={activeTab}
       onTabChange={setActiveTab}
+      forecastView={forecastView}
+      onForecastViewChange={setForecastView}
       onLogout={handleLogout}
     />
   );

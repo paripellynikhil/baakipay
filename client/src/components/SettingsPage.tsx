@@ -1,7 +1,7 @@
 import { useCallback, useState, type ChangeEvent, type FormEvent } from 'react';
 import { useI18n } from '../i18n/I18n';
 import type { TranslationKey } from '../i18n/translations';
-import { updateProfile, type Shop } from '../lib/shopApi';
+import { trialDaysLeft, updateProfile, type Shop } from '../lib/shopApi';
 import { downloadShopBackup } from '../lib/shopBackup';
 import { Field, inputClass, linkClass, primaryClass } from './FormControls';
 import PricingCompareModal from './PricingCompareModal';
@@ -62,6 +62,7 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
   const [toast, setToast] = useState<string | null>(null);
   const [compareOpen, setCompareOpen] = useState(false);
   const clearToast = useCallback(() => setToast(null), []);
+  const daysLeft = trialDaysLeft(shop.trial_expires_at);
 
   function setField(key: keyof ProfileForm) {
     return (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
@@ -105,6 +106,9 @@ export default function SettingsPage({ shop, onLogout }: SettingsPageProps) {
         <p className="text-sm font-semibold text-slate-500">{t('settings.plan_label')}</p>
         <div className="flex flex-wrap items-center gap-2">
           <span className="w-fit rounded-full bg-[#1E1B4B] px-3 py-1 text-sm font-semibold text-white">{t(planLabelKey(shop))}</span>
+          {daysLeft !== null && daysLeft > 0 && (
+            <span className="w-fit rounded-full bg-[#F59E0B] px-3 py-1 text-sm font-bold text-[#0F172A]">{t('pricing.days_left').replace('{n}', String(daysLeft))}</span>
+          )}
           <button type="button" onClick={() => setCompareOpen(true)} className={`${linkClass} w-fit`}>{t('pricing.compare')}</button>
         </div>
         <p className="text-xs text-slate-500">{t('settings.plan_readonly')}</p>
