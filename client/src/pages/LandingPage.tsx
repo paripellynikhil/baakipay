@@ -17,19 +17,43 @@ export default function LandingPage({ onLogin, onStartTrial }: LandingPageProps)
     <div className="min-h-screen bg-[#F8FAFC] text-[#1E1B4B]">
       <LandingTopBar onLogin={onLogin} onStartTrial={onStartTrial} />
       <main>
-        <div className="border-t border-[#1E1B4B]/10 bg-[#FFFBF2] py-12 md:py-16">
+        <div className="border-t border-[#1E1B4B]/10">
           <LandingHero onLogin={onLogin} onStartTrial={onStartTrial} />
         </div>
-        <div className="border-t border-[#1E1B4B]/10 bg-white py-12 md:py-16">
+        <div
+          className="relative max-w-5xl mx-auto border-t border-[#1E1B4B]/12"
+          aria-hidden="true"
+        >
+          <span className="absolute left-1/2 -translate-x-1/2 -top-[2px] w-10 h-1 rounded-full bg-[#F59E0B]" />
+        </div>
+        <div className="border-t border-[#1E1B4B]/10">
           <LandingHowItWorks />
         </div>
-        <div className="border-t border-[#1E1B4B]/10 bg-[#F4F3FF] py-12 md:py-16">
+        <div
+          className="relative max-w-5xl mx-auto border-t border-[#1E1B4B]/12"
+          aria-hidden="true"
+        >
+          <span className="absolute left-1/2 -translate-x-1/2 -top-[2px] w-10 h-1 rounded-full bg-[#F59E0B]" />
+        </div>
+        <div className="border-t border-[#1E1B4B]/10">
           <LandingFeatures />
         </div>
-        <div className="border-t border-[#1E1B4B]/10 bg-white py-12 md:py-16">
+        <div
+          className="relative max-w-5xl mx-auto border-t border-[#1E1B4B]/12"
+          aria-hidden="true"
+        >
+          <span className="absolute left-1/2 -translate-x-1/2 -top-[2px] w-10 h-1 rounded-full bg-[#F59E0B]" />
+        </div>
+        <div className="border-t border-[#1E1B4B]/10">
           <LandingPricing onStartTrial={onStartTrial} />
         </div>
-        <div className="border-t border-[#1E1B4B]/10 bg-[#FFFBF2] py-12 md:py-16">
+        <div
+          className="relative max-w-5xl mx-auto border-t border-[#1E1B4B]/12"
+          aria-hidden="true"
+        >
+          <span className="absolute left-1/2 -translate-x-1/2 -top-[2px] w-10 h-1 rounded-full bg-[#F59E0B]" />
+        </div>
+        <div className="border-t border-[#1E1B4B]/10">
           <LandingAbout />
         </div>
       </main>
