@@ -60,7 +60,7 @@ export default function Layout({
   const showHealthCrumb = activeTab === 'future' && forecastView === 'health';
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] text-slate-900">
+    <div className="min-h-screen text-slate-900">
       <aside className="hidden lg:flex fixed inset-y-0 left-0 w-[240px] flex-col gap-4 bg-[#1E1B4B] p-5 text-white">
         <div className="px-1 pt-2">
           <button type="button" onClick={() => onTabChange('home')} className="cursor-pointer">

@@ -25,54 +25,56 @@ A 1–5 person shop owner acts as cashier, buyer, accountant, and collector—lo
 
 BaakiPay is a **mobile-first, trilingual (English, తెలుగు, हिन्दी)** one-person back office built specifically for Indian neighborhood shops:
 
-1. **Cash Forecast Engine & What-If Simulator (Killer Feature)**
-   - Projects daily running cash balances across **7, 30, 60, and 90 days** from cash in hand, expected customer collections, and upcoming shop bills.
-   - Highlights the **lowest projected cash balance** and flags cash gaps before rent or supplier bills bounce.
+1. **Cash Forecast Engine, Safe Cash Buffer & What-If Simulator (Killer Feature)**
+   - 2-column fintech layout pairing an interactive **7/30/60/90-day area chart** with a live **Cash Gap / Cash Safe Status Widget**.
+   - Lets shopkeepers set a **Minimum Safe Cash Buffer (Reserve Fund)** and shows plain, human-friendly shortfall guidance in **English, Telugu, and Hindi**.
    - **3 Interactive What-If Toggles (Pro / 14-Day Trial):**
      - *Top customer pays 15 days late*
      - *Bad day: 5 customers pay 15 days late*
      - *Give ₹15,000 more credit (paid back in 35 days)*
 
-2. **2-Tap Billing, UPI QR & Print-Clean PDF**
-   - Creates sequential, unique invoices (`INV-001`, `INV-002`, ...) with live totals, credit-limit warnings at **80%+**, and an immutable **SHA-256 `record_hash`** for tamper-evident proof.
-   - Displays a scannable **UPI QR code** (`qrcode.react`), 1-page printable PDF invoice, and itemized WhatsApp sharing.
+2. **2-Tap Billing, Voice-to-Bill, UPI QR & 1-Page Print-Clean PDF**
+   - Includes a **searchable Customer combobox** with inline **`+ Add New Customer`** and a multi-language **Voice-to-Bill mic** (`EN/తె/हि` — speak *"kandipappu 5 kgs 300"* to auto-fill item, quantity, and unit price).
+   - Creates sequential, unique invoices (`INV-001`, `INV-002`, ...) with **80%+ credit-limit warnings**, an immutable **SHA-256 `record_hash`**, scannable **UPI QR** (`qrcode.react`), 1-page printable PDF, and itemized WhatsApp sharing.
 
-3. **Open Invoice Badges & Instant Tracking**
-   - Every customer card shows their **open (unpaid/partial) invoice codes** (e.g., `INV-013`, `INV-022`) as pills—searchable right from the Customers search bar—and clears each badge automatically once fully paid.
+3. **Clickable Open Invoice Badges & 1-Tap Customer Monthly Statement PDF**
+   - Every customer card displays brand-colored, searchable **open invoice pills** (e.g., `INV-013 ↗`, `INV-022 ↗`)—tap any pill to re-open its Invoice Proof / PDF / WhatsApp modal anytime, or tap **Statement** for a 1-page printable customer ledger statement.
 
 4. **Safe 3-Step Paste UPI SMS Auto-Match (Privacy-First)**
    - Never asks for Android/iOS SMS inbox permissions and never touches bank OTPs.
-   - Paste any UPI credit SMS (parses `Rs.` / `INR` / `₹` amounts, `INV-XXX` codes, and sender names), disambiguates multi-name matches (e.g., *Rahul Sharma* vs. *Rahul Verma*), handles partial payments, and **always requires 1-tap owner confirmation** before updating balances.
+   - Parses `Rs.` / `INR` / `₹` amounts (ignoring UPI Ref IDs), `INV-XXX` codes, and sender names, disambiguates multi-name matches (*Rahul Sharma* vs. *Rahul Verma*), handles partial payments, and **always requires 1-tap owner confirmation**.
 
-5. **Assisted WhatsApp Reminders with 24-Hour Cooldown**
-   - Home Dashboard surfaces the **Top 3 overdue customers** not reminded in the last 24 hours.
-   - Offers **Gentle, Firm, and Urgent** templates in **English, Telugu, and Hindi** with 1-tap Copy or Open WhatsApp.
+5. **Assisted WhatsApp Reminders & Safe Demo Mode**
+   - Home Dashboard surfaces the **Top 3 overdue customers** not reminded in the last 24 hours, with **Gentle, Firm, and Urgent** templates in **English, Telugu, and Hindi**.
+   - Synthetic demo numbers (`90000000XX`) safely open `wa.me/?text=...` so reviewers can preview in **"Message Yourself"** without ever messaging a real person.
 
-6. **My Bills (Expenses) & Business Health Summary PDF**
-   - Tracks recurring shop bills (Rent, Staff, Supplier, Electricity) and updates cash in hand atomically in PostgreSQL transactions.
-   - Generates a **6-month Business Health Analytics** view (on-time rate, average days to collect, top overdue customers, localized Smart Tips) and a printable **Self-Generated Business Health Summary PDF** carrying a SHA-256 verification hash and a clear non-audited operational disclaimer.
+6. **My Bills, Business Health PDF, Digital Shop Card, CSV Backup & InfoTips**
+   - Tracks recurring shop bills with confirmation-guarded deletes and atomic PostgreSQL cash updates.
+   - Generates a **6-month Business Health Analytics** view with localized Smart Tips and a printable **Business Health Summary PDF** (with SHA-256 verification hash and non-audited operational disclaimer).
+   - Settings includes a **Shareable Digital Shop Card** (UPI QR + Google Maps link), **1-Click Full Shop Data Backup (CSV)**, live **Trial Countdown badge**, and a **Compare Plans** modal, plus `?` **InfoTip** helpers across the app.
 
-7. **Offline-Resilient & Privacy-Safe**
-   - Caches shop-scoped data (`baakipay_${shopId}_*`) for instant viewing on patchy shop internet, and clears all local cache on logout.
-   - Never collects bank account numbers, IFSC codes, or SMS inbox access.
+7. **Commercial Landing Page, Hash Persistence & Privacy Promise**
+   - Public visitors see the full **BaakiPay Landing Page** (How it works, Features, 3-Tier Pricing with Plan Terms, About & Privacy Promise); returning logged-in shopkeepers skip straight to their Dashboard and stay on their active screen across browser refreshes.
+   - Caches shop-scoped data (`baakipay_${shopId}_*`) for patchy shop internet, clears all local cache on logout, and never collects bank account numbers, IFSC codes, or SMS inbox access.
 
 ## Business Viability & Pricing
 
 | Tier | Price | Includes |
 | --- | --- | --- |
-| **14-Day Free Pro Trial** | ₹0 (14 days) | Full Pro access on sign-up, no card required |
-| **Free Starter** | ₹0 forever | Up to 10 invoices/month, 7-day cash forecast, full access to existing data, *"Powered by BaakiPay"* PDF footer |
-| **BaakiPay Pro** | **₹199/mo** or **₹1,999/yr** | Unlimited invoices, 30/60/90-day forecast, What-If Simulator, unbranded PDFs |
+| **14-Day Free Pro Trial** | ₹0 (14 days) | Full Pro features, no card required, subtle *"Powered by BaakiPay"* footer, zero auto-charge after 14 days |
+| **Free Starter** | ₹0 forever | Up to 10 invoices/month, 7-day cash forecast, lifetime access to existing data, *"Powered by BaakiPay"* footer |
+| **BaakiPay Pro** | **₹199/mo** or **₹1,999/yr** | Unlimited invoices, 30/60/90-day forecast, What-If Simulator, clean unbranded PDFs & WhatsApp |
 
 At **₹1,999/year** (or **₹199/month**), BaakiPay costs roughly half of typical Indian small-business billing suites—which commonly charge **₹3,500–₹4,800/year** on annual plans—while adding predictive cash forecasting and What-If stress testing that free basic ledger apps do not provide ([Billing App Pricing Comparison, July 2026](https://vanijbill.com/blog/billing-app-pricing-compared/)).
 
-## Tech Stack & Architecture
+## Tech Stack, Architecture & Automated Tests
 
-- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, `qrcode.react`, custom trilingual i18n (`EN | తె | हि`)
+- **Frontend:** React 19, TypeScript, Vite, Tailwind CSS, `qrcode.react`, Web Speech API, custom trilingual i18n (`EN | తె | हि`)
 - **Backend:** Node.js, Express, JWT Authentication, `bcryptjs`, PostgreSQL (`pg`) with transactional row locks
-- **Database:** [Neon](https://neon.tech/) Serverless PostgreSQL (AWS Singapore)
-- **Hosting:** [Render](https://render.com/) single-service deployment (Express serves API + Vite production bundle)
-- **Automated Tests:** Vitest (**14 passing tests** — 11 backend forecast engine tests + 3 frontend analytics tests)
+- **Database & Hosting:** [Neon](https://neon.tech/) Serverless PostgreSQL (AWS Singapore) + [Render](https://render.com/) single-service HTTPS deployment
+- **Automated Test Suite — 41 Passing Tests (Vitest):**
+  - **Backend (23/23 passing across 2 files):** Forecast engine & What-If math (`forecastEngine.test.js`) + API integration & security tests covering `/api/health`, JSON `404`, `401` auth guards, `BR-008` `403` free-plan 10-bill limit, and `BR-006` UPI SMS parsing (`apiSecurity.test.js`)
+  - **Frontend (18/18 passing across 2 files):** Analytics API & caching (`analyticsApi.test.ts`) + Voice-to-Bill parser, Safe Demo WhatsApp URL routing, and 3×3 trilingual reminder templates (`features.test.ts`)
 
 ## Local Development & Running Tests
 
@@ -88,7 +90,7 @@ cp server/.env.example server/.env
 cd server
 node db/seed.js
 
-# 4. Run automated tests
+# 4. Run all 41 automated tests
 cd server && npm test
 cd ../client && npm test
 
