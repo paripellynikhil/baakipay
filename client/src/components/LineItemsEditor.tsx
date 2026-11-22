@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { inputClass, linkClass } from './FormControls';
 import { useI18n } from '../i18n/I18n';
 import { readItemNames } from '../lib/invoiceMath';
+import { parseVoiceLine } from './voiceLineParser';
+import { getRecognizerCtor, useVoiceLine } from './useVoiceLine';
 
 // String fields keep in-progress typing ("0.", "") intact until validation.
 export interface LineRow {
@@ -20,12 +22,26 @@ interface LineItemsEditorProps {
   shopId: string;
   rows: LineRow[];
   onChange: (rows: LineRow[]) => void;
-  onAddRow: () => void;
+  onAddRow: (patch?: Partial<LineRow>) => void;
 }
 
 export function LineItemsEditor({ shopId, rows, onChange, onAddRow }: LineItemsEditorProps) {
   const { t } = useI18n();
   const [itemNames] = useState<string[]>(() => readItemNames(shopId));
+  const [voiceMsg, setVoiceMsg] = useState<string | null>(null);
+  const voiceSupported = getRecognizerCtor() !== null;
+  const voice = useVoiceLine(
+    (text) => {
+      const line = parseVoiceLine(text);
+      if (line) {
+        setVoiceMsg(null);
+        onAddRow(line);
+      } else {
+        setVoiceMsg(t('voice.notUnderstood'));
+      }
+    },
+    () => setVoiceMsg(t('voice.error')),
+  );
 
   function update(id: number, patch: Partial<LineRow>) {
     onChange(rows.map((r) => (r.id === id ? { ...r, ...patch } : r)));
@@ -94,9 +110,27 @@ export function LineItemsEditor({ shopId, rows, onChange, onAddRow }: LineItemsE
         </div>
       ))}
 
-      <button type="button" onClick={onAddRow} className={linkClass}>
-        {t('invoices.addItem')}
-      </button>
+      <div className="flex flex-wrap items-center gap-4">
+        <button type="button" onClick={() => onAddRow()} className={linkClass}>
+          {t('invoices.addItem')}
+        </button>
+        {voiceSupported && (
+          <button
+            type="button"
+            onClick={voice.toggle}
+            aria-pressed={voice.listening}
+            className={`${linkClass} ${voice.listening ? 'text-red-600' : ''}`}
+          >
+            🎤 {voice.listening ? t('voice.stop') : t('voice.start')}
+          </button>
+        )}
+      </div>
+      {voice.listening && (
+        <p role="status" className="text-sm text-[#1E1B4B]">
+          {t('voice.listening')}
+        </p>
+      )}
+      {voiceMsg && <p role="alert" className="text-sm text-red-600">{voiceMsg}</p>}
     </div>
   );
 }

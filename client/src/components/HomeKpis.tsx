@@ -9,7 +9,7 @@ interface Props {
 
 function KpiCard({ label, value, hint, accent }: { label: string; value: string; hint?: string; accent: string }) {
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
+    <div className="soft-brutal-card relative overflow-hidden rounded-2xl bg-white p-4 shadow-sm">
       <div className="absolute inset-x-0 top-0 h-[3px]" style={{ backgroundColor: accent }} aria-hidden="true" />
       <p className="text-xs font-semibold text-slate-500">{label}</p>
       <p className="mt-1 text-xl font-bold text-[#1E1B4B]">{value}</p>

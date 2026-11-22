@@ -61,14 +61,14 @@ export function AnalyticsPage() {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {kpis.map((k) => (
-          <div key={k.label} className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+          <div key={k.label} className="soft-brutal-card rounded-xl border border-[#E2E8F0] bg-white p-4">
             <p className="text-xs font-semibold text-[#64748B]">{k.label}</p>
             <p className="mt-1 text-2xl font-bold text-[#1E1B4B]">{k.value}</p>
           </div>
         ))}
       </div>
 
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+      <div className="soft-brutal-card rounded-xl border border-[#E2E8F0] bg-white p-4">
         <h2 className="mb-3 text-sm font-semibold text-[#1E1B4B]">{t('analytics.chart_title')}</h2>
         <div className="flex h-40 items-end gap-3">
           {data.months.map((m) => (
@@ -91,7 +91,7 @@ export function AnalyticsPage() {
         </div>
       </div>
 
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+      <div className="soft-brutal-card rounded-xl border border-[#E2E8F0] bg-white p-4">
         <h2 className="mb-2 text-sm font-semibold text-[#1E1B4B]">{t('analytics.overdue_title')}</h2>
         {data.topOverdue.length === 0 ? (
           <p className="text-sm text-[#64748B]">{t('analytics.overdue_empty')}</p>
@@ -107,7 +107,7 @@ export function AnalyticsPage() {
         )}
       </div>
 
-      <div className="rounded-xl border border-[#E2E8F0] bg-white p-4">
+      <div className="soft-brutal-card rounded-xl border border-[#E2E8F0] bg-white p-4">
         <h2 className="mb-2 text-sm font-semibold text-[#1E1B4B]">{t('analytics.tips_title')}</h2>
         <ul className="list-disc pl-5 text-sm text-[#334155]">
           {smartTips.map((tip) => (

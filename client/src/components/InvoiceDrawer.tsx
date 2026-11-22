@@ -70,9 +70,9 @@ export default function InvoiceDrawer({ shopId, customer, onClose, onCreated }: 
   const grandTotal = grandTotalOf(subtotal, toNum(invoiceDiscount));
   const warn = selected !== null && nearCreditLimit(toNum(selected.totalOwed), toNum(selected.creditLimit), grandTotal);
 
-  function addRow() {
+  function addRow(patch?: Partial<LineRow>) {
     const id = nextId.current++;
-    setRows((prev) => [...prev, newRow(id)]);
+    setRows((prev) => [...prev, { ...newRow(id), ...patch }]);
   }
 
   function validate(): boolean {
@@ -141,7 +141,13 @@ export default function InvoiceDrawer({ shopId, customer, onClose, onCreated }: 
             </div>
           )}
 
-          <CustomerSelect customers={customers} value={customerId} error={customerError} onChange={setCustomerId} />
+          <CustomerSelect
+            customers={customers}
+            value={customerId}
+            error={customerError}
+            onChange={setCustomerId}
+            onAdded={(c) => setCustomers((prev) => [...prev, c])}
+          />
 
           <Field
             id="inv-due"

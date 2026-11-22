@@ -146,7 +146,7 @@ export default function HomePage({ shop, onOpenForecast, onOpenCustomers }: Home
 
       <HomeKpis cashInHand={toNum(shop.cash_in_hand)} toCollect={toCollect} upcomingBills={upcomingBills} />
 
-      <section className="rounded-2xl bg-white p-4 shadow-sm">
+      <section className="soft-brutal-card rounded-2xl bg-white p-4 shadow-sm">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-sm font-bold text-[#1E1B4B]">{t('home.forecast_preview')}</h2>
           <button type="button" onClick={onOpenForecast} className="text-xs font-semibold text-[#16A34A]">

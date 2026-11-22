@@ -2,9 +2,9 @@ import { useId } from 'react';
 import { useI18n } from '../i18n/I18n';
 import type { ForecastPoint } from '../lib/forecastApi';
 
-// Responsive SVG line chart: green area above zero, red area below, zero line as the danger boundary.
+// Responsive SVG line chart: green area above the buffer line, red area below, buffer line as the danger boundary.
 const W = 320;
-const H = 180;
+const H = 220;
 const PAD_X = 8;
 const PAD_Y = 12;
 const PAD_BOTTOM = 18;
@@ -21,16 +21,17 @@ function shortDate(iso: string): string {
 export interface ForecastChartProps {
   points: ForecastPoint[];
   simulated?: ForecastPoint[] | null;
+  buffer?: number;
 }
 
-export default function ForecastChart({ points, simulated }: ForecastChartProps) {
+export default function ForecastChart({ points, simulated, buffer = 0 }: ForecastChartProps) {
   const { t } = useI18n();
   const uid = useId().replace(/:/g, '');
   const n = points.length;
   if (n < 2) return null;
 
-  // Domain always includes zero so the danger boundary is visible.
-  const all = [0, ...points.map((p) => p.balance), ...(simulated ?? []).map((p) => p.balance)];
+  // Domain always includes the buffer line so the danger boundary is visible.
+  const all = [buffer, ...points.map((p) => p.balance), ...(simulated ?? []).map((p) => p.balance)];
   const min = Math.min(...all);
   const max = Math.max(...all) === min ? min + 1 : Math.max(...all);
   const innerW = W - PAD_X * 2;
@@ -38,35 +39,35 @@ export default function ForecastChart({ points, simulated }: ForecastChartProps)
 
   const x = (i: number) => PAD_X + (i / (n - 1)) * innerW;
   const y = (v: number) => PAD_Y + ((max - v) / (max - min)) * innerH;
-  const zeroY = y(0);
+  const lineY = y(buffer);
   const fmt = (v: number) => v.toFixed(1);
 
   const linePath = (pts: ForecastPoint[]) =>
     pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${fmt(x(i))} ${fmt(y(p.balance))}`).join(' ');
   const areaPath =
-    `M${fmt(x(0))} ${fmt(zeroY)} ` +
+    `M${fmt(x(0))} ${fmt(lineY)} ` +
     points.map((p, i) => `L${fmt(x(i))} ${fmt(y(p.balance))}`).join(' ') +
-    ` L${fmt(x(n - 1))} ${fmt(zeroY)} Z`;
+    ` L${fmt(x(n - 1))} ${fmt(lineY)} Z`;
 
   const midIndex = Math.floor((n - 1) / 2);
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} width="100%" aria-hidden="true" className="block h-auto w-full">
+    <svg viewBox={`0 0 ${W} ${H}`} width="100%" height={H} aria-hidden="true" className="block w-full">
       <defs>
         <clipPath id={`${uid}-above`}>
-          <rect x="0" y="0" width={W} height={fmt(zeroY)} />
+          <rect x="0" y="0" width={W} height={fmt(lineY)} />
         </clipPath>
         <clipPath id={`${uid}-below`}>
-          <rect x="0" y={fmt(zeroY)} width={W} height={fmt(H - zeroY)} />
+          <rect x="0" y={fmt(lineY)} width={W} height={fmt(H - lineY)} />
         </clipPath>
       </defs>
 
       <path d={areaPath} fill={GREEN} fillOpacity={0.18} clipPath={`url(#${uid}-above)`} />
       <path d={areaPath} fill={RED} fillOpacity={0.22} clipPath={`url(#${uid}-below)`} />
 
-      <line x1={PAD_X} x2={W - PAD_X} y1={fmt(zeroY)} y2={fmt(zeroY)} stroke={RED} strokeWidth={1} strokeDasharray="4 3" />
-      {min < 0 && (
-        <text x={PAD_X} y={fmt(zeroY - 3)} fontSize={9} fill={RED}>
+      <line x1={PAD_X} x2={W - PAD_X} y1={fmt(lineY)} y2={fmt(lineY)} stroke={RED} strokeWidth={1} strokeDasharray="4 3" />
+      {min < buffer && (
+        <text x={PAD_X} y={fmt(lineY - 3)} fontSize={9} fill={RED}>
           {t('forecast.danger_zone')}
         </text>
       )}

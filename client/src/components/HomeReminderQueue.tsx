@@ -28,7 +28,7 @@ export default function HomeReminderQueue({ rows, shopName, onReminded }: Props)
       ) : (
         <ul className="flex flex-col gap-2">
           {rows.map((row) => (
-            <li key={row.invoice.id} className="flex items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-sm">
+            <li key={row.invoice.id} className="soft-brutal-card flex items-center justify-between gap-3 rounded-xl bg-white p-3 shadow-sm">
               <div className="min-w-0">
                 <p className="truncate font-semibold text-slate-800">{row.customer.name}</p>
                 <p className="text-sm text-slate-500">{formatRupees(row.balance)}</p>
