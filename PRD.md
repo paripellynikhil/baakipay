@@ -5,7 +5,7 @@
 | :--- | :--- |
 | **Product Name** | **BaakiPay** |
 | **Tagline** | *Every rupee, right on time.* |
-| **Document Version** | 1.5 (Final Sealed Release 1.0 — Implementation-Ready) |
+| **Document Version** | 1.0 (Final Sealed Release — Implementation-Ready) |
 | **Date** | 21 November 2026 |
 | **Status** | Sealed & Ready for Milestone 1 |
 
